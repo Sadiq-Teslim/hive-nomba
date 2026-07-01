@@ -11,3 +11,6 @@ coverage/
 prisma/*.db
 prisma/*.db-journal
 .pnpm-store/
+
+# TypeScript incremental build info
+*.tsbuildinfo
