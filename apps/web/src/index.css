@@ -1,0 +1,80 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  @apply bg-ink-900 text-slate-200 antialiased;
+  overflow-x: hidden;
+}
+
+/* ── Landing doodle wallpaper: tone-on-tone commerce motifs + a soft top glow ─ */
+.hive-doodle-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  pointer-events: none;
+  background-color: #0b0d12;
+  background-image: url("/hive-doodles.svg");
+  background-repeat: repeat;
+  background-size: 440px 440px;
+  /* slow, seamless diagonal drift (offsets are multiples of the 440px tile) */
+  animation: hiveDrift 75s linear infinite;
+}
+@keyframes hiveDrift {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -440px -880px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hive-doodle-bg {
+    animation: none;
+  }
+}
+
+/* WhatsApp conversation wallpaper — subtle tiled doodle over the dark base */
+.wa-wallpaper {
+  background-color: #0b141a;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='0.025' stroke-width='2'%3E%3Ccircle cx='20' cy='20' r='8'/%3E%3Cpath d='M55 18h22M66 7v22'/%3E%3Cpath d='M100 12l10 10-10 10-10-10z'/%3E%3Cpath d='M18 60q10-12 22 0t22 0'/%3E%3Crect x='92' y='58' width='20' height='16' rx='3'/%3E%3Ccircle cx='30' cy='108' r='7'/%3E%3Cpath d='M62 100l8 8m0-8l-8 8'/%3E%3Cpath d='M98 104h18M107 95v18'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+/* Bubble tails (WhatsApp-style little corner) */
+.wa-tail-out::before,
+.wa-tail-in::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 8px;
+  height: 13px;
+}
+.wa-tail-out::before {
+  right: -8px;
+  background: radial-gradient(circle at bottom left, transparent 8px, #005c4b 0) top left/8px 13px no-repeat;
+}
+.wa-tail-in::before {
+  left: -8px;
+  background: radial-gradient(circle at bottom right, transparent 8px, #202c33 0) top right/8px 13px no-repeat;
+}
+
+/* Slim, themed scrollbars */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-ink-500 rounded-full;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
