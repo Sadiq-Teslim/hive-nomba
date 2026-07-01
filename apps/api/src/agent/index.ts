@@ -1,6 +1,6 @@
 import type { Party } from "@prisma/client";
 import { logger } from "../config/logger.js";
-import { generate, aiEnabled, type ChatMessage } from "./llm.js";
+import { generate, describeImage, aiEnabled, type ChatMessage } from "./llm.js";
 import { MERCHANT_PROMPT, CUSTOMER_PROMPT, LOBBY_PROMPT } from "./prompt.js";
 import { declarationsFor, executeTool, type ToolContext } from "./tools.js";
 import type { RouteMode } from "../services/router.service.js";
@@ -74,18 +74,21 @@ export async function runAgent(input: AgentInput): Promise<AgentReply> {
     messages.push({ role: m.role === "USER" ? "user" : "assistant", content: m.content });
   }
 
+  // Image handling: a vision pass turns the photo into a text description, which
+  // we fold into the user turn. The tool-calling loop then runs on the reliable
+  // text model (the vision model mistypes numeric tool args).
+  let userText = input.text || "";
   if (input.image) {
-    const dataUrl = `data:${input.image.mimeType};base64,${input.image.base64}`;
-    messages.push({
-      role: "user",
-      content: [
-        { type: "text", text: input.text || "Here is a product photo." },
-        { type: "image_url", image_url: { url: dataUrl } },
-      ],
-    });
-  } else {
-    messages.push({ role: "user", content: input.text || "(no text)" });
+    try {
+      const desc = await describeImage(input.image, input.text || "What product is in this photo?");
+      logger.debug({ desc }, "vision description");
+      userText = `${input.text ? input.text + "\n\n" : ""}[The user attached a product photo. It shows: ${desc}]`;
+    } catch (err) {
+      logger.warn({ err }, "vision describe failed");
+      userText = input.text || "(the user sent a photo, but I couldn't read it — ask them to describe it)";
+    }
   }
+  messages.push({ role: "user", content: userText || "(no text)" });
 
   let finalText = "";
   // Deterministic artifacts pulled straight from tool results — never trust the
@@ -94,7 +97,7 @@ export async function runAgent(input: AgentInput): Promise<AgentReply> {
 
   try {
     for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
-      const result = await generate({ messages, tools, vision: Boolean(input.image) && round === 0 });
+      const result = await generate({ messages, tools });
 
       if (result.toolCalls.length === 0) {
         finalText = result.text;

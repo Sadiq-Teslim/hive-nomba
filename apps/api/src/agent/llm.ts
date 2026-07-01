@@ -31,8 +31,6 @@ export interface ToolSchema {
 export interface GenerateArgs {
   messages: ChatMessage[];
   tools: ToolSchema[];
-  /** Use the vision-capable model (an image is present in the messages). */
-  vision?: boolean;
 }
 
 export interface GenerateResult {
@@ -50,12 +48,45 @@ function getClient(): Groq {
 
 export const aiEnabled = () => features.ai;
 
+/**
+ * Vision pass: describe a product photo as plain text. We keep this separate from
+ * tool-calling — the vision model is great at seeing but emits tool-call params
+ * with the wrong types (numbers as strings), so we let the text model make the
+ * actual tool calls using this description as context.
+ */
+export async function describeImage(
+  image: { base64: string; mimeType: string },
+  hint: string,
+): Promise<string> {
+  const groq = getClient();
+  const dataUrl = `data:${image.mimeType};base64,${image.base64}`;
+  const response = await groq.chat.completions.create({
+    model: env.GROQ_VISION_MODEL,
+    messages: [
+      {
+        role: "system",
+        content:
+          "You identify products from photos for an online store. Reply with a short product name, then a one-sentence description. No preamble, no markdown.",
+      },
+      {
+        role: "user",
+        content: [
+          { type: "text", text: hint || "What product is in this photo?" },
+          { type: "image_url", image_url: { url: dataUrl } },
+        ],
+      },
+    ] as never,
+    temperature: 0.3,
+    max_tokens: 120,
+  });
+  return response.choices[0]?.message?.content?.trim() ?? "";
+}
+
 export async function generate(args: GenerateArgs): Promise<GenerateResult> {
   const groq = getClient();
-  const model = args.vision ? env.GROQ_VISION_MODEL : env.GROQ_MODEL;
 
   const response = await groq.chat.completions.create({
-    model,
+    model: env.GROQ_MODEL,
     messages: args.messages as never,
     tools: args.tools.length ? (args.tools as never) : undefined,
     tool_choice: args.tools.length ? "auto" : undefined,
