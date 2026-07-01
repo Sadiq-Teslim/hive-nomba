@@ -1,0 +1,9 @@
+# Outray tunnel config for Hive — stable public URL for Nomba/WhatsApp webhooks.
+# Run with:  outray start --config outray.toml
+# The fixed subdomain means the public URL (https://hive-ace.outray.app) never
+# changes across restarts, so the webhook URL submitted to Nomba stays valid.
+
+[tunnel.hive-api]
+protocol = "http"
+local_port = 4000
+subdomain = "hive-ace"
