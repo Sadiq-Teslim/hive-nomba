@@ -1,0 +1,225 @@
+// Hive — data model
+// The single source of truth for merchants, products, customers, orders and payments.
+// Everything flows from a WhatsApp conversation; the AI agent reads/writes these tables.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ───────────────────────────── Merchant ─────────────────────────────
+// The business owner. Identified by their WhatsApp number. One merchant = one store (MVP).
+model Merchant {
+  id            String   @id @default(cuid())
+  whatsappPhone String   @unique // E.164, e.g. 2348012345678
+  businessName  String?
+  ownerName     String?
+  category      String? // fashion, food, electronics, pharmacy, salon, etc.
+  currency      String   @default("NGN")
+  onboarded     Boolean  @default(false)
+  // Store info customers ask about ("where are you?", "do you deliver?", "hours?").
+  address       String?
+  businessHours String? // freeform, e.g. "Mon–Sat 9am–6pm"
+  deliveryInfo  String? // freeform, e.g. "We deliver in Lagos, ₦2,000 flat"
+  contactInfo   String? // phone/email/handle to reach the business
+  about         String? // short description / bio
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  products      Product[]
+  customers     Customer[]
+  orders        Order[]
+  conversations Conversation[]
+  supportTickets SupportTicket[]
+
+  @@index([whatsappPhone])
+}
+
+// ───────────────────────────── Product ──────────────────────────────
+model Product {
+  id          String   @id @default(cuid())
+  merchantId  String
+  merchant    Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  priceKobo   Int // price in minor units (kobo). 1 NGN = 100 kobo.
+  stock       Int      @default(0)
+  imageUrl    String?
+  sku         String?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orderItems OrderItem[]
+
+  @@index([merchantId])
+}
+
+// ───────────────────────────── Customer ─────────────────────────────
+// A buyer who interacts with a specific merchant via WhatsApp.
+model Customer {
+  id            String   @id @default(cuid())
+  merchantId    String
+  merchant      Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  whatsappPhone String
+  name          String?
+  lastOrderedAt DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  orders        Order[]
+  conversations Conversation[]
+  supportTickets SupportTicket[]
+
+  @@unique([merchantId, whatsappPhone])
+  @@index([merchantId])
+}
+
+// ───────────────────────────── Order ────────────────────────────────
+enum OrderStatus {
+  DRAFT // being assembled in conversation
+  PENDING_PAYMENT // payment issued, awaiting payment
+  PAID // payment confirmed
+  FULFILLED
+  CANCELLED
+  REFUNDED // paid order refunded/returned
+}
+
+model Order {
+  id         String      @id @default(cuid())
+  reference  String      @unique // human/Nomba-friendly ref, e.g. HIVE-AB12CD
+  merchantId String
+  merchant   Merchant    @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  customerId String?
+  customer   Customer?   @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  status     OrderStatus @default(DRAFT)
+  totalKobo  Int         @default(0)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  items   OrderItem[]
+  payment Payment?
+
+  @@index([merchantId])
+  @@index([customerId])
+}
+
+model OrderItem {
+  id            String  @id @default(cuid())
+  orderId       String
+  order         Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId     String?
+  product       Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  nameSnapshot  String // product name captured at order time
+  priceKobo     Int // unit price captured at order time
+  quantity      Int     @default(1)
+
+  @@index([orderId])
+}
+
+// ───────────────────────────── Payment ──────────────────────────────
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  LINK // Nomba hosted checkout (card/etc.)
+  VIRTUAL_ACCOUNT // pay by bank transfer to a dedicated Nomba account
+}
+
+model Payment {
+  id            String        @id @default(cuid())
+  orderId       String        @unique
+  order         Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  provider      String        @default("nomba")
+  method        PaymentMethod @default(LINK)
+  amountKobo    Int
+  currency      String        @default("NGN")
+  status        PaymentStatus @default(PENDING)
+  checkoutUrl   String? // Nomba payment link URL (LINK method)
+  providerRef   String? // Nomba order/transaction reference
+  txnId         String? // Nomba transaction id (for refunds)
+  vaNumber      String? // virtual account number (VIRTUAL_ACCOUNT method)
+  vaBank        String? // virtual account bank name
+  vaName        String? // virtual account holder name
+  rawWebhook    Json? // last raw webhook payload for audit
+  paidAt        DateTime?
+  refundedAt    DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([providerRef])
+}
+
+// ──────────────────── Support / complaints ──────────────────────────
+enum TicketStatus {
+  OPEN
+  RESOLVED
+}
+
+model SupportTicket {
+  id         String       @id @default(cuid())
+  merchantId String
+  merchant   Merchant     @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  customerId String?
+  customer   Customer?    @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  phone      String
+  category   String       @default("complaint") // complaint | question | refund | other
+  message    String
+  orderRef   String? // related order, if any
+  status     TicketStatus @default(OPEN)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  @@index([merchantId])
+}
+
+// ──────────────────── Conversation & Message (AI memory) ─────────────
+// One conversation thread per phone number per merchant context.
+enum Party {
+  MERCHANT
+  CUSTOMER
+}
+
+model Conversation {
+  id         String   @id @default(cuid())
+  merchantId String?
+  merchant   Merchant? @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  customerId String?
+  customer   Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  party      Party
+  phone      String // the WhatsApp number this thread belongs to
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  messages Message[]
+
+  @@unique([phone, party])
+  @@index([merchantId])
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  TOOL
+  SYSTEM
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role           MessageRole
+  content        String // text content or serialized tool call/result
+  toolName       String?
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId])
+}
