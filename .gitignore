@@ -14,3 +14,7 @@ prisma/*.db-journal
 
 # TypeScript incremental build info
 *.tsbuildinfo
+
+# Local deploy notes with real secrets — never commit
+DEPLOY.md
+.env.production*
