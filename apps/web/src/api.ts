@@ -52,7 +52,13 @@ export interface Order {
   createdAt: string;
 }
 
-const BASE = "/api/dashboard";
+/**
+ * API origin. Empty in dev (Vite proxies /api → the backend). In production set
+ * VITE_API_BASE to the deployed API URL (e.g. https://hive-api.onrender.com).
+ */
+export const API_ORIGIN = (import.meta.env.VITE_API_BASE ?? "").replace(/\/$/, "");
+
+const BASE = `${API_ORIGIN}/api/dashboard`;
 
 async function get<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE}${path}`);

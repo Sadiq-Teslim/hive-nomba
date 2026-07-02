@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ChatMessage, Persona } from "./types";
 import { PERSONAS, greetingFor } from "./personas";
+import { API_ORIGIN } from "../../api";
 
 type Threads = Record<string, ChatMessage[]>;
 
@@ -74,7 +75,7 @@ export function useChats() {
           body.image = { base64, mimeType };
         }
 
-        const res = await fetch("/api/chat", {
+        const res = await fetch(`${API_ORIGIN}/api/chat`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
