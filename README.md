@@ -119,6 +119,23 @@ curl -s localhost:4000/api/chat -H 'content-type: application/json' \
 #   and stock/order/receipts update automatically.
 ```
 
+## Testing payments (Nomba sandbox)
+
+Hive runs on Nomba's **sandbox**, so no real money moves. To complete a payment on
+the Nomba checkout page, choose **Pay with card** and use Nomba's test card:
+
+| Field | Value |
+|---|---|
+| Card number | `5434621074252808` (successful Mastercard) |
+| Expiry / CVV | any (e.g. `12/29`, `123`) — not validated |
+| Card PIN | `1234` |
+| OTP | `9999` → "Approved by Financial Institution" |
+
+> Use `5484497218317651` to simulate a **declined** card. The bank-transfer /
+> virtual-account option won't auto-settle in sandbox (no real inflow) — card is
+> the instant path. Once approved, Hive auto-verifies with Nomba and confirms the
+> order. See the [Nomba sandbox docs](https://developer.nomba.com/docs/products/accept-payment/sandbox-testing).
+
 ## Going live
 
 ### Public tunnel (Outray)

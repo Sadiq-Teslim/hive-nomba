@@ -2,7 +2,7 @@ import { env, features } from "../../config/env.js";
 import { logger } from "../../config/logger.js";
 import type { AgentReply } from "../../agent/index.js";
 import { sendMetaWhatsApp, sendMetaButtons, sendMetaCtaUrl, fetchMetaMedia } from "./meta.client.js";
-import { sendTwilioWhatsApp } from "./twilio.client.js";
+import { sendTwilioWhatsApp, sendTwilioContent, twilioTemplateFor } from "./twilio.client.js";
 
 /**
  * Provider-agnostic WhatsApp send. Dispatches to Twilio or Meta based on
@@ -46,7 +46,18 @@ export async function sendWhatsAppReply(to: string, reply: AgentReply): Promise<
     return sendMetaWhatsApp(to, reply.text);
   }
 
-  // Twilio (no easy native buttons in the basic API) → text with link/options inline.
+  // Twilio: use a Content Template for native quick-reply buttons when the button
+  // set matches a known menu (welcome / payment). Otherwise fall back to text.
+  if (reply.buttons?.length && !reply.cta) {
+    const sid = twilioTemplateFor(reply.buttons);
+    if (sid) {
+      try {
+        return await sendTwilioContent(to, sid, reply.text);
+      } catch {
+        // template send failed (e.g. sandbox restriction) → graceful text fallback
+      }
+    }
+  }
   await sendTwilioWhatsApp(to, renderAsText(reply));
 }
 

@@ -39,6 +39,43 @@ export async function sendTwilioWhatsApp(to: string, body: string): Promise<void
   }
 }
 
+/**
+ * Pick a pre-built Content Template (native quick-reply buttons) for a set of
+ * agent buttons. Only the two fixed menus map to templates; anything else
+ * (e.g. the dynamic store picker) returns null → the caller sends a text list.
+ */
+export function twilioTemplateFor(buttons: string[]): string | null {
+  const set = buttons.map((b) => b.toLowerCase());
+  const has = (kw: string) => set.some((b) => b.includes(kw));
+  if (env.TWILIO_CONTENT_PAYMENT_SID && has("card") && (has("transfer") || has("bank"))) {
+    return env.TWILIO_CONTENT_PAYMENT_SID;
+  }
+  if (env.TWILIO_CONTENT_WELCOME_SID && has("browse") && has("track")) {
+    return env.TWILIO_CONTENT_WELCOME_SID;
+  }
+  return null;
+}
+
+/** Send a Content Template message (native buttons). `body` fills the {{1}} variable. */
+export async function sendTwilioContent(to: string, contentSid: string, body: string): Promise<void> {
+  const form = new URLSearchParams({
+    From: toTwilioAddress(env.TWILIO_WHATSAPP_FROM),
+    To: toTwilioAddress(to),
+    ContentSid: contentSid,
+    ContentVariables: JSON.stringify({ 1: body || " " }),
+  });
+  try {
+    await axios.post(MESSAGES_URL(env.TWILIO_ACCOUNT_SID), form.toString(), {
+      auth: { username: env.TWILIO_ACCOUNT_SID, password: env.TWILIO_AUTH_TOKEN },
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    });
+  } catch (err) {
+    const detail = axios.isAxiosError(err) ? err.response?.data : err;
+    logger.error({ to, contentSid, detail }, "Failed to send Twilio content message");
+    throw err;
+  }
+}
+
 /** Fetch inbound media (Twilio media URLs require Basic auth) → base64 + mime. */
 export async function fetchTwilioMedia(mediaUrl: string): Promise<{ base64: string; mimeType: string }> {
   const res = await axios.get(mediaUrl, {

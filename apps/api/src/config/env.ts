@@ -34,6 +34,10 @@ const schema = z.object({
     .string()
     .default("false")
     .transform((v) => v.toLowerCase() === "true"),
+  // Twilio Content Template SIDs for native quick-reply buttons (created via
+  // scripts/setup-twilio-content.mjs). Empty = fall back to a text list.
+  TWILIO_CONTENT_WELCOME_SID: z.string().default(""),
+  TWILIO_CONTENT_PAYMENT_SID: z.string().default(""),
 
   NOMBA_BASE_URL: z.string().default("https://api.nomba.com"),
   NOMBA_CLIENT_ID: z.string().default(""),
