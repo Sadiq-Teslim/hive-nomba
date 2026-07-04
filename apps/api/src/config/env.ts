@@ -45,6 +45,10 @@ const schema = z.object({
   NOMBA_WEBHOOK_SECRET: z.string().default(""),
 
   CLOUDINARY_URL: z.string().default(""),
+
+  // Keep-alive self-ping interval (ms) to stop the host (e.g. Render free tier)
+  // from sleeping. Only runs in production against a real public URL.
+  KEEPALIVE_INTERVAL_MS: z.coerce.number().default(60_000),
 });
 
 const parsed = schema.safeParse(process.env);
