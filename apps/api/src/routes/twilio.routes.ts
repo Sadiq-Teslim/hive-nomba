@@ -3,7 +3,7 @@ import { env, features } from "../config/env.js";
 import { logger } from "../config/logger.js";
 import { handleInbound } from "../services/inbound.service.js";
 import { sendWhatsAppReply } from "../integrations/whatsapp/whatsapp.client.js";
-import { fetchTwilioMedia, validateTwilioSignature } from "../integrations/whatsapp/twilio.client.js";
+import { fetchTwilioMedia, validateTwilioSignature, toTwilioAddress } from "../integrations/whatsapp/twilio.client.js";
 
 export const twilioRouter = Router();
 
@@ -36,6 +36,14 @@ twilioRouter.post("/webhooks/twilio", (req, res) => {
 async function handleTwilioInbound(body: Record<string, string>): Promise<void> {
   const from = body.From; // e.g. "whatsapp:+2348190000002"
   if (!from) return;
+
+  // Ignore anything that appears to come from our own WhatsApp number (an echo or
+  // self-message). Replying would set To == From and Twilio rejects it (error 63031),
+  // and if it were a loop it would spam. Never reply to ourselves.
+  if (toTwilioAddress(from) === toTwilioAddress(env.TWILIO_WHATSAPP_FROM)) {
+    logger.warn({ from }, "Ignoring Twilio inbound from our own number (self/echo)");
+    return;
+  }
 
   let text = body.Body ?? "";
   let image: { base64: string; mimeType: string } | undefined;

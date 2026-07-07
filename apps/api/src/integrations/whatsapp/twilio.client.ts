@@ -20,7 +20,20 @@ export function toTwilioAddress(phone: string): string {
   return `whatsapp:+${digits}`;
 }
 
+/**
+ * True when a recipient is our own WhatsApp number. Sending to yourself is a no-op
+ * that Twilio rejects (error 63031: same To and From), so callers skip it.
+ */
+function isSelf(to: string): boolean {
+  return toTwilioAddress(to) === toTwilioAddress(env.TWILIO_WHATSAPP_FROM);
+}
+
 export async function sendTwilioWhatsApp(to: string, body: string): Promise<void> {
+  if (isSelf(to)) {
+    logger.warn({ to }, "Skipping Twilio send to our own number (would be 63031)");
+    return;
+  }
+
   const form = new URLSearchParams({
     From: toTwilioAddress(env.TWILIO_WHATSAPP_FROM),
     To: toTwilioAddress(to),
@@ -58,6 +71,11 @@ export function twilioTemplateFor(buttons: string[]): string | null {
 
 /** Send a Content Template message (native buttons). `body` fills the {{1}} variable. */
 export async function sendTwilioContent(to: string, contentSid: string, body: string): Promise<void> {
+  if (isSelf(to)) {
+    logger.warn({ to }, "Skipping Twilio content send to our own number (would be 63031)");
+    return;
+  }
+
   const form = new URLSearchParams({
     From: toTwilioAddress(env.TWILIO_WHATSAPP_FROM),
     To: toTwilioAddress(to),
