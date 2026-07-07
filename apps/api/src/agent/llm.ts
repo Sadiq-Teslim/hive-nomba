@@ -82,38 +82,61 @@ export async function describeImage(
   return response.choices[0]?.message?.content?.trim() ?? "";
 }
 
+/**
+ * gpt-oss occasionally leaks a "harmony" channel control token into a tool name
+ * (e.g. `raise_support<|channel|>commentary`), which Groq rejects with
+ * `tool_use_failed`. It's stochastic, so a plain retry almost always yields a
+ * clean call. We only retry this specific validation failure — never rate limits.
+ */
+function isToolValidationError(err: unknown): boolean {
+  const msg = String((err as { message?: string })?.message ?? err);
+  return /tool_use_failed|tool call validation failed/i.test(msg);
+}
+
 export async function generate(args: GenerateArgs): Promise<GenerateResult> {
   const groq = getClient();
+  const MAX_ATTEMPTS = 3;
 
-  const response = await groq.chat.completions.create({
-    model: env.GROQ_MODEL,
-    messages: args.messages as never,
-    tools: args.tools.length ? (args.tools as never) : undefined,
-    tool_choice: args.tools.length ? "auto" : undefined,
-    temperature: 0.4,
-    max_tokens: 1024,
-  });
-
-  const choice = response.choices[0];
-  const msg = choice?.message;
-
-  const toolCalls = (msg?.tool_calls ?? []).map((tc) => {
-    let parsed: Record<string, unknown> = {};
+  let lastErr: unknown;
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     try {
-      parsed = tc.function.arguments ? JSON.parse(tc.function.arguments) : {};
-    } catch {
-      parsed = {};
-    }
-    return { id: tc.id, name: tc.function.name, args: parsed };
-  });
+      const response = await groq.chat.completions.create({
+        model: env.GROQ_MODEL,
+        messages: args.messages as never,
+        tools: args.tools.length ? (args.tools as never) : undefined,
+        tool_choice: args.tools.length ? "auto" : undefined,
+        temperature: 0.4,
+        max_tokens: 1024,
+      });
 
-  return {
-    text: msg?.content ?? "",
-    toolCalls,
-    assistantMessage: {
-      role: "assistant",
-      content: msg?.content ?? null,
-      tool_calls: msg?.tool_calls as ToolCall[] | undefined,
-    },
-  };
+      const choice = response.choices[0];
+      const msg = choice?.message;
+
+      const toolCalls = (msg?.tool_calls ?? []).map((tc) => {
+        let parsed: Record<string, unknown> = {};
+        try {
+          parsed = tc.function.arguments ? JSON.parse(tc.function.arguments) : {};
+        } catch {
+          parsed = {};
+        }
+        return { id: tc.id, name: tc.function.name, args: parsed };
+      });
+
+      return {
+        text: msg?.content ?? "",
+        toolCalls,
+        assistantMessage: {
+          role: "assistant",
+          content: msg?.content ?? null,
+          tool_calls: msg?.tool_calls as ToolCall[] | undefined,
+        },
+      };
+    } catch (err) {
+      lastErr = err;
+      if (!isToolValidationError(err) || attempt === MAX_ATTEMPTS) throw err;
+      // brief backoff before re-rolling the completion
+      await new Promise((r) => setTimeout(r, 250 * attempt));
+    }
+  }
+  throw lastErr;
 }
