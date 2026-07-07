@@ -18,3 +18,7 @@ prisma/*.db-journal
 # Local deploy notes with real secrets — never commit
 DEPLOY.md
 .env.production*
+
+# Planning / scratch artifacts — not part of the shipped project
+*.pdf
+shot*.mjs

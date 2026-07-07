@@ -1,194 +1,198 @@
-# 🐝 Hive — The First AI Employee for African SMEs
+<div align="center">
 
-Hive is an AI employee that lives inside **WhatsApp**. Merchants run their entire
-business by chatting — adding products, updating stock, generating payment links,
-tracking sales — and customers browse, order, and pay without leaving the chat.
-**Nomba** is the financial engine: payment links + webhooks that auto-reconcile
-inventory, orders, and receipts.
+# 🐝 Hive
 
-> Built for the DevCareer × Nomba Hackathon.
+### The first AI employee for African SMEs — buy and sell entirely by chatting on WhatsApp.
 
-## What's built (backend + AI — the demo-critical path)
+Merchants run their whole business by chatting. Customers browse, order, and pay — without ever leaving the chat.
+**[Nomba](https://nomba.com)** is the money engine underneath it all.
 
-- **Conversational AI employee** — Groq (Llama 3.3 70B) with function calling. The
-  agent *does work* (creates products, orders, payment links) rather than just chatting.
-- **Two modes, one number** — the same WhatsApp number serves merchants (manage
-  store) and customers (shop), routed automatically.
-- **Nomba integration** — payment-link creation + signed webhook → auto stock
-  decrement, order status, and receipts. A built-in **mock checkout** lets the
-  full payment loop run locally with no Nomba account.
-- **WhatsApp Cloud API** — inbound webhook (text + product images) and outbound
-  replies. Falls back to logging when not configured.
-- **AI product onboarding from images** — send a product photo; a Groq vision
-  model (Llama 4 Scout) drafts the listing.
-- **Dashboard API** — read-only REST endpoints for the (secondary) web dashboard.
+<br/>
 
-- **Live merchant dashboard** (`apps/web`) — a responsive React/Tailwind console
-  that reads the dashboard API and **auto-refreshes every 4s**, so a payment made
-  over WhatsApp visibly updates revenue, orders, and stock on screen. Icons by
-  [Hugeicons](https://hugeicons.com).
+[![Live Demo](https://img.shields.io/badge/▶_Live_Demo-hive--nomba.vercel.app-FFC107?style=for-the-badge&labelColor=111)](https://hive-nomba-web.vercel.app)
+[![Powered by Nomba](https://img.shields.io/badge/Payments-Nomba-000000?style=for-the-badge&labelColor=111)](https://nomba.com)
+[![WhatsApp](https://img.shields.io/badge/Channel-WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white&labelColor=111)](https://wa.me/14155238886)
+
+<sub>Built for the **DevCareer × Nomba Hackathon 2026** · Team Ace</sub>
+
+<br/>
+
+![Hive landing page](docs/screenshots/landing.png)
+
+</div>
+
+---
+
+## The problem
+
+Millions of African traders already run their entire business inside **WhatsApp** — DMs
+for orders, screenshots for prices, "I've sent it" for payments. It works, but it doesn't
+scale: no catalogue, no stock tracking, no payment confirmation, no records. Existing
+e-commerce tools ask them to abandon the channel they and their customers actually live in,
+download an app, and learn a dashboard. They won't.
+
+## The solution
+
+**Hive is an AI employee that lives in the chat they already use.** One WhatsApp number, two
+sides of a real business:
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+### 🛍️ For sellers
+
+Chat to run the shop — no app, no dashboard to learn.
+
+- *"Add Ankara Gown, ₦18,500, 12 in stock"* — or just **send a photo** and Hive drafts the listing with AI vision.
+- *"How are my sales?"* → revenue, top products, order status.
+- Auto-updates stock, confirms payments, and writes the receipt.
+- Every order and naira is recorded — a real ledger, built by talking.
+
+</td>
+<td width="50%" valign="top">
+
+### 🛒 For buyers
+
+Shop and pay in the same chat — no app, no card typed into a random site.
+
+- Pick a store, browse products, place an order in plain language.
+- Hive replies with **native WhatsApp buttons** and a real **Nomba** payment link.
+- Pay by card or transfer → instant confirmation right in the thread.
+- Order status, receipts, and support — all in one conversation.
+
+</td>
+</tr>
+</table>
+
+---
+
+## See it work
+
+<div align="center">
+
+### One WhatsApp thread: browse → order → pay
+
+<img src="docs/screenshots/whatsapp.png" alt="Hive buyer flow on WhatsApp" width="380"/>
+
+<sub>A customer picks a store from native quick-reply buttons, orders, and gets a live Nomba payment link — all inside WhatsApp.</sub>
+
+<br/><br/>
+
+### The live merchant dashboard — updates the instant a WhatsApp payment lands
+
+![Hive merchant dashboard](docs/screenshots/dashboard.png)
+
+<sub>Revenue, order-status breakdown, top products and recent orders. Read-only companion to the chat — the phone is the product. Auto-refreshes every 4s.</sub>
+
+</div>
+
+---
+
+## Powered by Nomba 💚
+
+Nomba isn't a bolt-on — it's the financial spine that makes a *conversation* into a
+*transaction*:
+
+| Capability | How Hive uses it |
+|---|---|
+| **Payment links** | Every order becomes a hosted Nomba checkout, dropped straight into the chat. |
+| **Signed webhooks** | On payment, an HMAC-SHA256-verified webhook auto-decrements stock, flips the order to *Paid*, and fires receipts to both sides. |
+| **Active verification** | Hive also polls Nomba (`/v1/transactions/accounts`) by order reference, so a payment confirms even if a webhook is delayed. |
+| **Virtual accounts & refunds** | Wired for pay-by-transfer and reversals on Nomba's sandbox. |
+
+> Running on the **Nomba sandbox** — no real money moves. Card `5434621074252808`, PIN `1234`, OTP `9999` completes a test payment end-to-end.
+
+---
+
+## How it's built
 
 ```
 apps/
-├── api/                   # backend + AI
-│   ├── src/
-│   │   ├── agent/         # LLM provider (Groq), prompts, tool registry, agent loop
-│   │   ├── config/        # env, logger, prisma client
-│   │   ├── integrations/  # nomba/, whatsapp/
-│   │   ├── routes/        # health, chat, whatsapp, nomba, mock, dashboard
-│   │   ├── services/      # merchant, product, customer, order, payment, analytics, ...
-│   │   └── utils/         # money (kobo), references
-│   └── prisma/            # schema + seed
-└── web/                   # live merchant dashboard (Vite + React + Tailwind)
-    └── src/
-        ├── components/    # StatCard, OrdersTable, TopProducts, ProductsPanel, Header
-        ├── hooks/         # useDashboard (polling)
-        └── api.ts         # typed client for the dashboard API
+├── api/                     # Node + Express + TypeScript + Prisma
+│   └── src/
+│       ├── agent/           # Groq LLM, prompts, ~20-tool function-calling registry, agent loop
+│       ├── integrations/    # nomba/  ·  whatsapp/ (twilio + meta, provider-switched)
+│       ├── routes/          # health · chat · whatsapp/twilio webhooks · nomba webhook · dashboard
+│       ├── services/        # merchant · product · customer · order · payment · analytics
+│       └── utils/           # money (kobo), references
+│
+└── web/                     # Vite + React + Tailwind
+    └── src/                 # live dashboard (polls every 4s) + pixel-faithful WhatsApp simulator
 ```
 
-## Prerequisites
+**The agent actually does the work.** Groq (`gpt-oss-20b`) drives a ~20-tool function-calling
+loop that creates products, places orders, mints payment links and reads analytics — not a
+chatbot that talks *about* the shop, an employee that *runs* it. Product photos route to a
+vision model (`llama-4-scout`) that drafts the listing. One number serves both roles: Hive
+routes each sender to the merchant console or the customer storefront automatically.
 
-- Node 20+ and pnpm 10+
-- PostgreSQL (local, or a free [Neon](https://neon.tech) / [Supabase](https://supabase.com) DB)
+### Stack
 
-## Setup
+`TypeScript` · `Node/Express` · `Prisma` · `Neon Postgres` · `Groq` · `Twilio WhatsApp` (+ Meta) · `Nomba` · `React/Vite/Tailwind` · deployed on `Render` + `Vercel` + `Neon`
+
+---
+
+## Run it locally
+
+You can run the **entire buy-sell-pay loop** with just a database and a free Groq key.
+WhatsApp and Nomba fall back to mock mode until you add their credentials.
 
 ```bash
 pnpm install
 
 cd apps/api
-cp .env.example .env          # then fill in values (see below)
-
+cp .env.example .env          # fill in DATABASE_URL + GROQ_API_KEY (see table below)
 pnpm db:push                  # create tables
 pnpm db:seed                  # seed the demo store "Bella's Fashion Hub"
-pnpm dev                      # start the API on http://localhost:4000
+
+cd ../..
+pnpm dev:all                  # API → :4000 · Dashboard → :5173 · Simulator → :5173/#/whatsapp
 ```
-
-### Run the dashboard + WhatsApp simulator
-
-```bash
-# from repo root — runs API + web together
-pnpm dev:all
-# API  → http://localhost:4000
-# Web  → http://localhost:5173            (dashboard; proxies /api to the backend)
-#      → http://localhost:5173/#/whatsapp (WhatsApp-style chat simulator)
-```
-
-### WhatsApp simulator
-
-A pixel-faithful WhatsApp chat UI to test the whole product without a Meta app —
-open it from the **Simulator** button on the dashboard, or go to `/#/whatsapp`.
-Two chats mirror the two sides of Hive:
-
-- **Hive** — you're *Bella, the merchant*: "add a product", "how are sales?", or
-  send a product photo for AI onboarding.
-- **Bella's Fashion Hub** — you're a *customer*: browse, order, and get a real
-  Nomba payment link rendered right in the chat.
-
-Messages hit the same `/api/chat` backend, so the simulator drives the real agent,
-real Nomba links, and the live dashboard.
-
-### Minimum env to demo locally
-
-You can run the **entire loop** with just a database + a Groq key. WhatsApp and
-Nomba run in mock mode until you add their credentials.
 
 | Variable | Needed for | Notes |
 |---|---|---|
-| `DATABASE_URL` | always | Local Postgres or Neon/Supabase. |
-| `GROQ_API_KEY` | the AI | Free key from [console.groq.com/keys](https://console.groq.com/keys). |
-| `WHATSAPP_*` | live WhatsApp | Optional — mock-logs replies when absent. |
+| `DATABASE_URL` | always | Local Postgres or a free [Neon](https://neon.tech). |
+| `GROQ_API_KEY` | the AI | Free at [console.groq.com/keys](https://console.groq.com/keys). |
+| `TWILIO_*` / `WHATSAPP_*` | live WhatsApp | Optional — mock-logs replies when absent. |
 | `NOMBA_*` | live payments | Optional — uses mock checkout when absent. |
 
-## Try it without WhatsApp (local simulator)
+### No WhatsApp account? Use the built-in simulator.
 
-`POST /api/chat` simulates a WhatsApp message and returns Hive's reply.
+Open the **Simulator** button on the dashboard (or `/#/whatsapp`) for a pixel-faithful
+WhatsApp UI wired to the *same* `/api/chat` backend — the real agent, real Nomba links, and
+the live dashboard all react to it. Or hit the API directly:
 
 ```bash
-# Talk to Hive as the MERCHANT (the seeded demo phone)
-curl -s localhost:4000/api/chat -H 'content-type: application/json' \
-  -d '{"phone":"2348100000001","text":"Add a new product: Silk Scarf, ₦6000, 15 in stock"}'
-
-# Talk to Hive as a CUSTOMER (any other number) and place an order
+# as a CUSTOMER — browse then order (any number that isn't the merchant's)
 curl -s localhost:4000/api/chat -H 'content-type: application/json' \
   -d '{"phone":"2348190000002","text":"What do you sell?"}'
 
 curl -s localhost:4000/api/chat -H 'content-type: application/json' \
   -d '{"phone":"2348190000002","text":"I want 2 Ankara Gowns and 1 Gele"}'
-# → Hive replies with a payment link. Open it, click Pay (mock Nomba),
-#   and stock/order/receipts update automatically.
+# → Hive replies with a Nomba payment link; paying updates stock, order & receipts.
 ```
 
-## Testing payments (Nomba sandbox)
+---
 
-Hive runs on Nomba's **sandbox**, so no real money moves. To complete a payment on
-the Nomba checkout page, choose **Pay with card** and use Nomba's test card:
+## 60-second demo script
 
-| Field | Value |
-|---|---|
-| Card number | `5434621074252808` (successful Mastercard) |
-| Expiry / CVV | any (e.g. `12/29`, `123`) — not validated |
-| Card PIN | `1234` |
-| OTP | `9999` → "Approved by Financial Institution" |
+1. **Seller:** *"Add Ankara Gown ₦18,500, 12 in stock"* — or send a product photo.
+2. **Buyer** (different number): *"What do you have?"* → *"I want 2 Ankara Gowns."*
+3. Hive creates the order and sends a **Nomba** payment link with pay buttons.
+4. Buyer pays (test card above) → webhook confirms → **stock drops, both parties notified.**
+5. **Seller:** *"How are sales going?"* → live revenue, orders, top products.
+6. Watch the **dashboard** update the moment the payment lands.
 
-> Use `5484497218317651` to simulate a **declined** card. The bank-transfer /
-> virtual-account option won't auto-settle in sandbox (no real inflow) — card is
-> the instant path. Once approved, Hive auto-verifies with Nomba and confirms the
-> order. See the [Nomba sandbox docs](https://developer.nomba.com/docs/products/accept-payment/sandbox-testing).
+---
 
-## Going live
+## Roadmap
 
-### Public tunnel (Outray)
+- Broadcast promotions & re-engagement to a store's customer list.
+- Nomba split settlements for multi-vendor marketplaces.
+- Redis-backed queue for webhook/agent processing at scale.
 
-Webhooks need a stable public URL. We use [Outray](https://outray.dev) with a
-**fixed subdomain** so the URL never changes — even across restarts — which means
-you submit it to Nomba once and never again.
-
-```bash
-# one-off
-outray start --config outray.toml          # → https://hive-ace.outray.app
-
-# resilient: auto-restarts if the tunnel drops (same URL comes back)
-pwsh ./scripts/tunnel.ps1                   # Windows
-bash  ./scripts/tunnel.sh                    # macOS/Linux/Git Bash
-```
-
-Set `PUBLIC_BASE_URL=https://hive-ace.outray.app` in `apps/api/.env` (already done).
-
-- **Nomba:** credentials are in `.env` (TEST active, LIVE commented). Submit your
-  webhook URL + sub-account ID to Nomba:
-  **`https://hive-ace.outray.app/api/webhooks/nomba`**.
-  When Nomba gives you a signing secret, set `NOMBA_WEBHOOK_SECRET` to enable
-  signature verification. Real `pay.nomba.com` checkout links replace the mock.
-- **WhatsApp (Twilio — recommended, fastest):** in the
-  [Twilio Console](https://console.twilio.com) → Messaging → **Try it out → WhatsApp Sandbox**:
-  1. From your phone, send `join <your-sandbox-code>` to the sandbox number to opt in.
-  2. Set **"When a message comes in"** to
-     **`https://hive-ace.outray.app/api/webhooks/twilio`** (HTTP POST).
-  3. Put `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and `TWILIO_WHATSAPP_FROM`
-     (e.g. `whatsapp:+14155238886`) in `.env`, keep `WHATSAPP_PROVIDER=twilio`, restart.
-  Now WhatsApp messages to the sandbox number hit the live agent.
-- **WhatsApp (Meta) alternative:** set `WHATSAPP_PROVIDER=meta`, point the Meta app
-  webhook to `https://hive-ace.outray.app/api/webhooks/whatsapp` with your
-  `WHATSAPP_VERIFY_TOKEN`, and fill the `WHATSAPP_*` vars.
-
-> **Roles on one number:** everyone messages the same WhatsApp number; Hive routes
-> by sender. A sender whose number is registered as a Merchant manages the store;
-> everyone else is a customer of the demo store. To run the business from your own
-> phone, register your number as the merchant (seed it or update the merchant's
-> `whatsappPhone`).
-
-## Demo script (matches the PRD)
-
-1. Merchant: *"Set up my store — Bella's Fashion Hub, fashion."*
-2. Merchant: *"Add Ankara Gown ₦18,500, 12 in stock"* (or send a photo).
-3. Customer (different number): *"What do you have?"* → *"I want 2 Ankara Gowns."*
-4. Hive creates the order + Nomba payment link and sends it.
-5. Customer pays → webhook confirms → stock drops, both parties get notified.
-6. Merchant: *"How are sales going?"* → revenue, orders, top products.
-
-## Roadmap (next)
-
-- Web dashboard (`apps/web`, React + Tailwind) consuming the dashboard API.
-- Redis-backed queue for webhook/agent processing.
-- Nomba virtual accounts, transfers, split settlements; promotions broadcast.
+<div align="center">
+<br/>
+<sub>Made with 🐝 for African traders — the people who buy and sell every day.</sub>
+</div>
