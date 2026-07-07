@@ -22,3 +22,7 @@ DEPLOY.md
 # Planning / scratch artifacts — not part of the shipped project
 *.pdf
 shot*.mjs
+
+# Generated demo voiceover audio (YarnGPT) — local only
+demo-voiceover/
+*.mp3
