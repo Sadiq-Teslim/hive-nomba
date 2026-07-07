@@ -100,7 +100,7 @@
   <header class="hero">
     <div class="bee">🐝</div>
     <h1>Hive — Demo Video <span>Production Sheet</span></h1>
-    <p>Everything to shoot, narrate & edit the ~90-second hackathon demo. OBS + scrcpy + YarnGPT.</p>
+    <p>Everything to shoot, narrate & edit the ~90-second hackathon demo. OBS + iPhone Screen Recording + YarnGPT.</p>
     <div class="pills">
       <span class="pill gold">Target: 90s–2:00</span>
       <span class="pill">1080p landscape</span>
@@ -119,11 +119,11 @@
   <div class="card">
     <div class="kbdcard">
       <div><b>Screen record</b>OBS Studio (free) — the whole video.</div>
-      <div><b>Phone on screen</b>scrcpy — mirror your Android into a window OBS can capture.</div>
+      <div><b>iPhone screen</b>Built-in Screen Recording (cleanest), or AirPlay to Windows for a live split.</div>
       <div><b>Voiceover</b>YarnGPT — paste the script (§5), export the audio.</div>
       <div><b>Edit + captions</b>Descript <span class="muted">or</span> CapCut — assemble, auto-caption, trim dead air.</div>
     </div>
-    <p class="muted" style="margin:12px 0 0;font-size:13px">iPhone instead of Android? Use <b>Win+G</b> screen mirroring via a QuickTime-style tool, or record the phone with a second camera — but scrcpy on Android is by far the cleanest for the split-screen money shot.</p>
+    <p class="muted" style="margin:12px 0 0;font-size:13px">On <b>iPhone + Windows</b> you can't use scrcpy (Android only). Instead, record the WhatsApp flow with the iPhone's <b>built-in Screen Recording</b> and drop that clip into the editor — perfect quality, zero mirroring. See §3.</p>
   </div>
 
   <!-- 2. OBS SETUP -->
@@ -140,25 +140,34 @@
       <li><b>Base &amp; Output resolution:</b> <code>1920×1080</code></li>
       <li><b>FPS:</b> <code>30</code></li>
     </ul>
-    <h3>Scenes to build ahead of time</h3>
+    <h3>What OBS records (the desktop half)</h3>
     <ul>
       <li><b>Scene A — Landing:</b> a Display/Window Capture of the browser on <code>hive-nomba-web.vercel.app</code>.</li>
-      <li><b>Scene B — Phone:</b> Window Capture of the <b>scrcpy</b> window (the WhatsApp chat), scaled to fill.</li>
-      <li><b>Scene C — Split (the money shot):</b> scrcpy window on the left, the <b>dashboard</b> browser on the right, side by side in one scene. Rehearse switching to this right before the payment confirms.</li>
+      <li><b>Scene B — Dashboard:</b> Window Capture of the merchant dashboard on store <b>Bella's Fashion Hub</b>. This is what you'll film while the payment lands, so the revenue/orders visibly tick up.</li>
     </ul>
+    <p class="muted" style="font-size:13px;margin:6px 0 0">Your <b>iPhone WhatsApp footage is recorded separately</b> on the phone (§3). The "split-screen money shot" is assembled in the editor — phone clip on the left, dashboard clip on the right — see §7. This is more reliable than live AirPlay mirroring and looks identical to viewers.</p>
     <div class="callout green"><strong>Audio tip:</strong> record <em>video only</em> in OBS (mute the mic) and lay the YarnGPT voiceover over it in the editor. Cleaner than narrating live, and you can re-do a line without re-shooting.</div>
   </div>
 
-  <!-- 3. scrcpy -->
-  <h2><span class="n">3</span> Mirror your phone (scrcpy)</h2>
+  <!-- 3. iphone capture -->
+  <h2><span class="n">3</span> Capture your iPhone screen</h2>
   <div class="card">
+    <h3>Recommended — built-in Screen Recording (no mirroring, perfect quality)</h3>
     <ol>
-      <li>On the phone: <b>Settings → About → tap Build number 7×</b> to unlock Developer options, then enable <b>USB debugging</b>.</li>
-      <li>Download scrcpy from <a href="https://github.com/Genymobile/scrcpy">github.com/Genymobile/scrcpy</a> (bundles ADB).</li>
-      <li>Plug the phone in via USB, accept the "Allow USB debugging?" prompt, then run:</li>
+      <li>Enable it once: <b>Settings → Control Center → add "Screen Recording".</b></li>
+      <li>Swipe down into Control Center, <b>long-press the record button</b>, and <b>turn the mic off</b> (you'll add YarnGPT audio later). Tap Record.</li>
+      <li>Perform the WhatsApp flow — seller adds a product, buyer orders, pays on the Nomba page. Take your time; you'll trim later.</li>
+      <li>Stop the recording. Transfer the <code>.mov</code> to your PC via <b>iCloud, a USB cable, or email to yourself</b>, and drop it into the editor as the "phone" layer.</li>
     </ol>
-    <pre>scrcpy --stay-awake --turn-screen-off=false --window-title "Hive Phone"</pre>
-    <p class="muted" style="font-size:13px;margin:6px 0 0">A live window of your phone appears. Add it in OBS as a <b>Window Capture</b> → "Hive Phone". Now WhatsApp shows up inside your recording at full quality.</p>
+    <div class="callout"><strong>Why this over mirroring:</strong> it's rock-solid, full resolution, and needs no extra software. The only thing you give up is a <em>live</em> split screen — which you rebuild in the editor (§7) by placing the phone clip and the dashboard clip side by side. Viewers can't tell the difference.</div>
+
+    <h3>Optional — live AirPlay to Windows (only if you want a true single-take split)</h3>
+    <ul>
+      <li>Install an AirPlay receiver on the PC: <b>LetsView</b> or <b>5KPlayer</b> (free), or <b>ApowerMirror</b> (paid, most reliable).</li>
+      <li>Put phone + PC on the <b>same Wi-Fi</b> → iPhone Control Center → <b>Screen Mirroring</b> → pick the PC app.</li>
+      <li>The iPhone appears in a window; capture it in OBS as a <b>Window Capture</b> next to the dashboard for a real-time split.</li>
+      <li class="muted" style="font-size:13px">Heads-up: AirPlay-to-Windows can stutter or drop. Test it first; if it's flaky, fall back to the built-in recorder above — it always works.</li>
+    </ul>
   </div>
 
   <!-- 4. PREFLIGHT -->
@@ -172,8 +181,9 @@
         <li>Two WhatsApp identities ready: <b>your phone = merchant</b>, a second number (or the Twilio sandbox) <b>= buyer</b>.</li>
         <li>Buyer number has sent <code>join &lt;sandbox-code&gt;</code> to the Twilio sandbox so replies flow.</li>
         <li>One full <b>dry run</b> end-to-end so the payment completes cleanly.</li>
+        <li>iPhone: <b>Screen Recording added to Control Center</b>, mic off, <b>Do Not Disturb on</b> (no banners mid-take).</li>
         <li>Close notifications / Slack / email popups. Clean browser (no bookmarks bar clutter).</li>
-        <li>Dashboard open on the store <b>Bella's Fashion Hub</b> in a second window for the split scene.</li>
+        <li>Dashboard open on the store <b>Bella's Fashion Hub</b> in OBS, ready to film while the payment lands.</li>
       </ul>
     </div>
     <div class="card">
@@ -248,7 +258,7 @@
         <div class="clock">1:16<small>💥 Money shot</small></div>
         <div class="say">
           <q>…paid. Instantly confirmed in the chat — and watch the merchant's dashboard: revenue, orders, and stock update live, the moment Nomba's webhook lands.</q>
-          <span class="action"><b>Switch to Scene C (split):</b> chat shows "Payment confirmed" on the left while the <b>dashboard revenue/orders tick up</b> on the right.</span>
+          <span class="action"><b>Split screen (built in the editor):</b> phone clip showing "Payment confirmed" on the left, OBS <b>dashboard clip with revenue/orders ticking up</b> on the right.</span>
         </div>
       </div>
 
@@ -275,7 +285,7 @@
         <tr><td class="time">0:36</td><td>Photo → AI listing</td><td>Phone: send photo → draft</td></tr>
         <tr><td class="time">0:48</td><td>Buyer browses + orders</td><td>Phone: store buttons → order</td></tr>
         <tr><td class="time">1:02</td><td>Nomba payment</td><td>Nomba checkout, test card</td></tr>
-        <tr><td class="time">1:16</td><td><b>Split: pay → dashboard live</b></td><td>Phone + dashboard side by side</td></tr>
+        <tr><td class="time">1:16</td><td><b>Split: pay → dashboard live</b></td><td>Phone clip + dashboard clip, side by side (editor)</td></tr>
         <tr><td class="time">1:34</td><td>Close + links</td><td>End card</td></tr>
       </tbody>
     </table>
@@ -285,7 +295,8 @@
   <h2><span class="n">7</span> Edit &amp; export</h2>
   <div class="card">
     <ol>
-      <li>Drop the OBS recording + YarnGPT audio into <b>Descript</b> (or CapCut). Line the voiceover up to the beats above.</li>
+      <li>Drop three things into <b>Descript</b> (or CapCut): the <b>iPhone screen recording</b>, the <b>OBS dashboard recording</b>, and the <b>YarnGPT audio</b>. Line the voiceover up to the beats above.</li>
+      <li><b>Build the money shot (1:16):</b> place the phone clip and the dashboard clip <b>side by side</b> on screen at the payment moment, and nudge their timing so the dashboard revenue/orders tick up right as the chat says "confirmed." This is your fake-but-flawless split screen.</li>
       <li><b>Auto-generate captions</b> — many judges watch muted. Keep them on the whole time.</li>
       <li>Add short <b>on-screen labels</b> at each beat: "Adding a product", "AI writes the listing", "Buyer pays via Nomba", "Stock updates live".</li>
       <li>Cut every spinner / cold-start lag / typo. No dead air — keep it moving.</li>
