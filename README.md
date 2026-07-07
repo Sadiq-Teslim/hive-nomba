@@ -175,17 +175,6 @@ curl -s localhost:4000/api/chat -H 'content-type: application/json' \
 
 ---
 
-## 60-second demo script
-
-1. **Seller:** *"Add Ankara Gown ₦18,500, 12 in stock"* — or send a product photo.
-2. **Buyer** (different number): *"What do you have?"* → *"I want 2 Ankara Gowns."*
-3. Hive creates the order and sends a **Nomba** payment link with pay buttons.
-4. Buyer pays (test card above) → webhook confirms → **stock drops, both parties notified.**
-5. **Seller:** *"How are sales going?"* → live revenue, orders, top products.
-6. Watch the **dashboard** update the moment the payment lands.
-
----
-
 ## Roadmap
 
 - Broadcast promotions & re-engagement to a store's customer list.
