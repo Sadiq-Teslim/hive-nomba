@@ -2,7 +2,7 @@ import axios from "axios";
 import { env } from "../../config/env.js";
 import { logger } from "../../config/logger.js";
 
-/** Meta WhatsApp Cloud API — send a text message. */
+/** Meta WhatsApp Cloud API - send a text message. */
 export async function sendMetaWhatsApp(to: string, body: string): Promise<void> {
   const url = `https://graph.facebook.com/${env.WHATSAPP_API_VERSION}/${env.WHATSAPP_PHONE_NUMBER_ID}/messages`;
   try {

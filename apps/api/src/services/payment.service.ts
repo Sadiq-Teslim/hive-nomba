@@ -35,7 +35,7 @@ export async function createPaymentLinkForOrder(orderId: string) {
     currency: "NGN",
     customerEmail,
     customerName: order.customer?.name ?? phone ?? undefined,
-    // Browser redirect after payment (NOT the webhook — that's configured on
+    // Browser redirect after payment (NOT the webhook - that's configured on
     // Nomba's side and hits POST /api/webhooks/nomba server-to-server).
     callbackUrl: `${env.PUBLIC_BASE_URL}/pay/complete`,
   });
@@ -141,7 +141,7 @@ export async function refundOrder(opts: { reference: string; merchantId?: string
   if (updated.customer?.whatsappPhone) {
     await sendWhatsAppText(
       updated.customer.whatsappPhone,
-      `💸 Your order ${updated.reference} has been refunded — ${total} is on its way back to you.${opts.reason ? `\nReason: ${opts.reason}` : ""}`,
+      `💸 Your order ${updated.reference} has been refunded - ${total} is on its way back to you.${opts.reason ? `\nReason: ${opts.reason}` : ""}`,
     ).catch((e) => logger.warn({ e }, "refund customer notify failed"));
   }
   if (updated.merchant?.whatsappPhone) {
@@ -156,7 +156,7 @@ export async function refundOrder(opts: { reference: string; merchantId?: string
 
 /**
  * Create a Nomba payment link for an arbitrary amount (not tied to catalogue
- * products) — e.g. a custom sale or service. Backed by a real order with a
+ * products) - e.g. a custom sale or service. Backed by a real order with a
  * single descriptive line so it reconciles through the same webhook flow.
  */
 export async function createCustomPaymentLink(opts: {

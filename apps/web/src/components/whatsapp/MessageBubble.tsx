@@ -75,7 +75,7 @@ export function MessageBubble({
           </span>
         </div>
 
-        {/* URL call-to-action button (e.g. "Pay Now") — attached to the bubble */}
+        {/* URL call-to-action button (e.g. "Pay Now") - attached to the bubble */}
         {msg.cta && (
           <a
             href={msg.cta.url}
@@ -89,7 +89,7 @@ export function MessageBubble({
         )}
       </div>
 
-      {/* Quick-reply buttons — full-width pills below the bubble */}
+      {/* Quick-reply buttons - full-width pills below the bubble */}
       {msg.buttons && msg.buttons.length > 0 && (
         <div className="mt-1 flex w-[78%] flex-col gap-1 sm:w-[65%]">
           {msg.buttons.map((label) => (

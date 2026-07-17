@@ -12,7 +12,7 @@ export const dashboardRouter = Router();
 
 dashboardRouter.get("/merchants", async (_req, res, next) => {
   try {
-    // Onboarded (named) stores first, then oldest — so the real demo store leads.
+    // Onboarded (named) stores first, then oldest - so the real demo store leads.
     const merchants = await prisma.merchant.findMany({
       orderBy: [{ onboarded: "desc" }, { createdAt: "asc" }],
     });

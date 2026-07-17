@@ -15,7 +15,7 @@ export function createApp() {
 
   app.use(cors());
 
-  // Nomba webhook needs the raw body for signature verification — mount it first.
+  // Nomba webhook needs the raw body for signature verification - mount it first.
   app.use("/api/webhooks/nomba", express.raw({ type: "*/*" }));
 
   // Everything else uses JSON / urlencoded.

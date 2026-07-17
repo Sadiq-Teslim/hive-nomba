@@ -32,7 +32,7 @@ export async function raiseTicket(input: RaiseTicketInput) {
   if (merchant?.whatsappPhone) {
     await sendWhatsAppText(
       merchant.whatsappPhone,
-      `⚠️ New ${ticket.category} from ${input.phone}${input.orderRef ? ` (order ${input.orderRef})` : ""}:\n"${input.message}"\n\nReply to the customer or sort it out — Hive has logged it.`,
+      `⚠️ New ${ticket.category} from ${input.phone}${input.orderRef ? ` (order ${input.orderRef})` : ""}:\n"${input.message}"\n\nReply to the customer or sort it out - Hive has logged it.`,
     ).catch((e) => logger.warn({ e }, "support merchant notify failed"));
   }
   logger.info({ ticketId: ticket.id, category: ticket.category }, "support ticket raised");

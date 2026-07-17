@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Hive — Demo Video Production Sheet</title>
+<title>Hive - Demo Video Production Sheet</title>
 <style>
   :root{
     --bg:#0f1115; --panel:#171a21; --panel2:#1e222b; --ink:#e9edf5; --muted:#9aa4b2;
@@ -99,7 +99,7 @@
 
   <header class="hero">
     <div class="bee">🐝</div>
-    <h1>Hive — Demo Video <span>Production Sheet</span></h1>
+    <h1>Hive - Demo Video <span>Production Sheet</span></h1>
     <p>Everything to shoot, narrate & edit the ~90-second hackathon demo. OBS + iPhone Screen Recording + YarnGPT.</p>
     <div class="pills">
       <span class="pill gold">Target: 90s–2:00</span>
@@ -118,12 +118,12 @@
   <h2><span class="n">1</span> Gear &amp; tools</h2>
   <div class="card">
     <div class="kbdcard">
-      <div><b>Screen record</b>OBS Studio (free) — the whole video.</div>
+      <div><b>Screen record</b>OBS Studio (free) - the whole video.</div>
       <div><b>iPhone screen</b>Built-in Screen Recording (cleanest), or AirPlay to Windows for a live split.</div>
-      <div><b>Voiceover</b>YarnGPT — paste the script (§5), export the audio.</div>
-      <div><b>Edit + captions</b>Descript <span class="muted">or</span> CapCut — assemble, auto-caption, trim dead air.</div>
+      <div><b>Voiceover</b>YarnGPT - paste the script (§5), export the audio.</div>
+      <div><b>Edit + captions</b>Descript <span class="muted">or</span> CapCut - assemble, auto-caption, trim dead air.</div>
     </div>
-    <p class="muted" style="margin:12px 0 0;font-size:13px">On <b>iPhone + Windows</b> you can't use scrcpy (Android only). Instead, record the WhatsApp flow with the iPhone's <b>built-in Screen Recording</b> and drop that clip into the editor — perfect quality, zero mirroring. See §3.</p>
+    <p class="muted" style="margin:12px 0 0;font-size:13px">On <b>iPhone + Windows</b> you can't use scrcpy (Android only). Instead, record the WhatsApp flow with the iPhone's <b>built-in Screen Recording</b> and drop that clip into the editor - perfect quality, zero mirroring. See §3.</p>
   </div>
 
   <!-- 2. OBS SETUP -->
@@ -142,31 +142,31 @@
     </ul>
     <h3>What OBS records (the desktop half)</h3>
     <ul>
-      <li><b>Scene A — Landing:</b> a Display/Window Capture of the browser on <code>hive-nomba-web.vercel.app</code>.</li>
-      <li><b>Scene B — Dashboard:</b> Window Capture of the merchant dashboard on store <b>Bella's Fashion Hub</b>. This is what you'll film while the payment lands, so the revenue/orders visibly tick up.</li>
+      <li><b>Scene A - Landing:</b> a Display/Window Capture of the browser on <code>hive-nomba-web.vercel.app</code>.</li>
+      <li><b>Scene B - Dashboard:</b> Window Capture of the merchant dashboard on store <b>Bella's Fashion Hub</b>. This is what you'll film while the payment lands, so the revenue/orders visibly tick up.</li>
     </ul>
-    <p class="muted" style="font-size:13px;margin:6px 0 0">Your <b>iPhone WhatsApp footage is recorded separately</b> on the phone (§3). The "split-screen money shot" is assembled in the editor — phone clip on the left, dashboard clip on the right — see §7. This is more reliable than live AirPlay mirroring and looks identical to viewers.</p>
+    <p class="muted" style="font-size:13px;margin:6px 0 0">Your <b>iPhone WhatsApp footage is recorded separately</b> on the phone (§3). The "split-screen money shot" is assembled in the editor - phone clip on the left, dashboard clip on the right - see §7. This is more reliable than live AirPlay mirroring and looks identical to viewers.</p>
     <div class="callout green"><strong>Audio tip:</strong> record <em>video only</em> in OBS (mute the mic) and lay the YarnGPT voiceover over it in the editor. Cleaner than narrating live, and you can re-do a line without re-shooting.</div>
   </div>
 
   <!-- 3. iphone capture -->
   <h2><span class="n">3</span> Capture your iPhone screen</h2>
   <div class="card">
-    <h3>Recommended — built-in Screen Recording (no mirroring, perfect quality)</h3>
+    <h3>Recommended - built-in Screen Recording (no mirroring, perfect quality)</h3>
     <ol>
       <li>Enable it once: <b>Settings → Control Center → add "Screen Recording".</b></li>
       <li>Swipe down into Control Center, <b>long-press the record button</b>, and <b>turn the mic off</b> (you'll add YarnGPT audio later). Tap Record.</li>
-      <li>Perform the WhatsApp flow — seller adds a product, buyer orders, pays on the Nomba page. Take your time; you'll trim later.</li>
+      <li>Perform the WhatsApp flow - seller adds a product, buyer orders, pays on the Nomba page. Take your time; you'll trim later.</li>
       <li>Stop the recording. Transfer the <code>.mov</code> to your PC via <b>iCloud, a USB cable, or email to yourself</b>, and drop it into the editor as the "phone" layer.</li>
     </ol>
-    <div class="callout"><strong>Why this over mirroring:</strong> it's rock-solid, full resolution, and needs no extra software. The only thing you give up is a <em>live</em> split screen — which you rebuild in the editor (§7) by placing the phone clip and the dashboard clip side by side. Viewers can't tell the difference.</div>
+    <div class="callout"><strong>Why this over mirroring:</strong> it's rock-solid, full resolution, and needs no extra software. The only thing you give up is a <em>live</em> split screen - which you rebuild in the editor (§7) by placing the phone clip and the dashboard clip side by side. Viewers can't tell the difference.</div>
 
-    <h3>Optional — live AirPlay to Windows (only if you want a true single-take split)</h3>
+    <h3>Optional - live AirPlay to Windows (only if you want a true single-take split)</h3>
     <ul>
       <li>Install an AirPlay receiver on the PC: <b>LetsView</b> or <b>5KPlayer</b> (free), or <b>ApowerMirror</b> (paid, most reliable).</li>
       <li>Put phone + PC on the <b>same Wi-Fi</b> → iPhone Control Center → <b>Screen Mirroring</b> → pick the PC app.</li>
       <li>The iPhone appears in a window; capture it in OBS as a <b>Window Capture</b> next to the dashboard for a real-time split.</li>
-      <li class="muted" style="font-size:13px">Heads-up: AirPlay-to-Windows can stutter or drop. Test it first; if it's flaky, fall back to the built-in recorder above — it always works.</li>
+      <li class="muted" style="font-size:13px">Heads-up: AirPlay-to-Windows can stutter or drop. Test it first; if it's flaky, fall back to the built-in recorder above - it always works.</li>
     </ul>
   </div>
 
@@ -176,8 +176,8 @@
     <div class="card">
       <h3>Before you hit record</h3>
       <ul class="check">
-        <li><b>Warm up the API</b> — open the app once so Render isn't cold-starting mid-demo.</li>
-        <li>Seed data is live — dashboard should already read <b>~₦819k</b> revenue, full chart. If not: <code>node --env-file=apps/api/.env apps/api/scripts/seed-demo-orders.mjs</code></li>
+        <li><b>Warm up the API</b> - open the app once so Render isn't cold-starting mid-demo.</li>
+        <li>Seed data is live - dashboard should already read <b>~₦819k</b> revenue, full chart. If not: <code>node --env-file=apps/api/.env apps/api/scripts/seed-demo-orders.mjs</code></li>
         <li>Two WhatsApp identities ready: <b>your phone = merchant</b>, a second number (or the Twilio sandbox) <b>= buyer</b>.</li>
         <li>Buyer number has sent <code>join &lt;sandbox-code&gt;</code> to the Twilio sandbox so replies flow.</li>
         <li>One full <b>dry run</b> end-to-end so the payment completes cleanly.</li>
@@ -191,26 +191,26 @@
       <div class="tblwrap" style="border:none">
       <table>
         <tr><td>Card number</td><td><code>5434621074252808</code></td></tr>
-        <tr><td>Expiry / CVV</td><td>any — e.g. <code>12/29</code> / <code>123</code></td></tr>
+        <tr><td>Expiry / CVV</td><td>any - e.g. <code>12/29</code> / <code>123</code></td></tr>
         <tr><td>PIN</td><td><code>1234</code></td></tr>
         <tr><td>OTP</td><td><code>9999</code> → Approved</td></tr>
       </table>
       </div>
-      <div class="callout nomba"><strong>Choose "Pay with card"</strong> on the Nomba page — the bank-transfer option won't auto-settle in sandbox. Card is the instant path.</div>
+      <div class="callout nomba"><strong>Choose "Pay with card"</strong> on the Nomba page - the bank-transfer option won't auto-settle in sandbox. Card is the instant path.</div>
     </div>
   </div>
 
   <!-- 5. LAPTOP WALKTHROUGH -->
-  <h2><span class="n">5</span> Laptop walkthrough <span class="muted" style="font-size:13px;font-weight:400">— what to open &amp; where to click</span></h2>
+  <h2><span class="n">5</span> Laptop walkthrough <span class="muted" style="font-size:13px;font-weight:400">- what to open &amp; where to click</span></h2>
   <div class="card">
-    <p style="margin-top:0">Your laptop only ever shows <b>two things</b>: the <b>landing page</b> (the story bookends) and the <b>dashboard</b> (the money shot). The WhatsApp chat itself is your <b>iPhone footage</b> — the laptop never shows WhatsApp.</p>
+    <p style="margin-top:0">Your laptop only ever shows <b>two things</b>: the <b>landing page</b> (the story bookends) and the <b>dashboard</b> (the money shot). The WhatsApp chat itself is your <b>iPhone footage</b> - the laptop never shows WhatsApp.</p>
     <h3>Open these two browser tabs before recording</h3>
     <div class="kbdcard">
-      <div><b>Tab 1 — Landing</b><code>hive-nomba-web.vercel.app</code></div>
-      <div><b>Tab 2 — Dashboard</b><code>hive-nomba-web.vercel.app/#/dashboard</code><br/><span class="muted" style="font-size:12px">loads Bella's Fashion Hub with the seeded ₦819k data</span></div>
+      <div><b>Tab 1 - Landing</b><code>hive-nomba-web.vercel.app</code></div>
+      <div><b>Tab 2 - Dashboard</b><code>hive-nomba-web.vercel.app/#/dashboard</code><br/><span class="muted" style="font-size:12px">loads Bella's Fashion Hub with the seeded ₦819k data</span></div>
     </div>
     <ul class="check" style="margin-top:14px">
-      <li><b>Warm up</b> both tabs — load each once so nothing cold-starts on camera.</li>
+      <li><b>Warm up</b> both tabs - load each once so nothing cold-starts on camera.</li>
       <li>Hide the bookmarks bar (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd>), <b>maximize</b> or <kbd>F11</kbd> fullscreen, browser <b>zoom 100%</b>.</li>
       <li>Notifications off / Do Not Disturb on. Clean, single browser window.</li>
     </ul>
@@ -222,8 +222,8 @@
         <tbody>
           <tr><td class="time">0:00<br><small class="muted">Hook</small></td><td>Tab 1</td><td>Start at the <b>hero</b> (top, <code>#home</code>). WhatsApp mockup visible on the right. Optional slow scroll.</td></tr>
           <tr><td class="time">0:12<br><small class="muted">Idea</small></td><td>Tab 1</td><td>Click <b>“For Vendors”</b> then <b>“For Buyers”</b> in the top nav (jumps to <code>#vendors</code> → <code>#buyers</code>) so both sides show. Optionally pause on <b>“Powered by Nomba”</b>.</td></tr>
-          <tr><td class="time">0:26–1:02</td><td class="muted">—</td><td class="muted">iPhone footage only (seller adds product/photo, buyer orders + pays). Laptop not on screen.</td></tr>
-          <tr><td class="time">1:16<br><small class="muted">💥 Money shot</small></td><td>Tab 2</td><td>The <b>dashboard</b> (<code>#/dashboard</code>). It <b>auto-refreshes every 4s</b>, so revenue/orders tick up on their own after the payment. Film this — in the edit you place it beside the phone's "Payment confirmed" clip.</td></tr>
+          <tr><td class="time">0:26–1:02</td><td class="muted">-</td><td class="muted">iPhone footage only (seller adds product/photo, buyer orders + pays). Laptop not on screen.</td></tr>
+          <tr><td class="time">1:16<br><small class="muted">💥 Money shot</small></td><td>Tab 2</td><td>The <b>dashboard</b> (<code>#/dashboard</code>). It <b>auto-refreshes every 4s</b>, so revenue/orders tick up on their own after the payment. Film this - in the edit you place it beside the phone's "Payment confirmed" clip.</td></tr>
           <tr><td class="time">1:34<br><small class="muted">Close</small></td><td>Tab 2 or 1</td><td>Hold on the dashboard, or click back to the landing footer / end card. Show the URL.</td></tr>
         </tbody>
       </table>
@@ -232,7 +232,7 @@
   </div>
 
   <!-- 6. SCRIPT -->
-  <h2><span class="n">6</span> Voiceover script <span class="muted" style="font-size:13px;font-weight:400">— paste each block into YarnGPT</span></h2>
+  <h2><span class="n">6</span> Voiceover script <span class="muted" style="font-size:13px;font-weight:400">- paste each block into YarnGPT</span></h2>
   <div class="card">
     <p class="muted" style="margin-top:0;font-size:13.5px">Read the <b>say</b> lines aloud (that's what goes into YarnGPT); the grey lines are what you do <b>on screen</b> under that narration. Total ≈ 105 seconds at a calm pace.</p>
     <div class="vo">
@@ -240,7 +240,7 @@
       <div class="beat">
         <div class="clock">0:00<small>Hook</small></div>
         <div class="say">
-          <q>Millions of African traders run their entire business inside WhatsApp — orders in the DMs, prices in screenshots, payments on trust. It works… but it doesn't scale.</q>
+          <q>Millions of African traders run their entire business inside WhatsApp - orders in the DMs, prices in screenshots, payments on trust. It works… but it doesn't scale.</q>
           <span class="action"><b>Show:</b> the Hive landing page (Scene A), slow scroll on the hero.</span>
         </div>
       </div>
@@ -248,7 +248,7 @@
       <div class="beat">
         <div class="clock">0:12<small>The idea</small></div>
         <div class="say">
-          <q>Meet Hive — the first AI employee for African SMEs. One WhatsApp number lets you run a whole shop, and lets your customers buy and pay… all by chatting. Powered by Nomba.</q>
+          <q>Meet Hive - the first AI employee for African SMEs. One WhatsApp number lets you run a whole shop, and lets your customers buy and pay… all by chatting. Powered by Nomba.</q>
           <span class="action"><b>Show:</b> landing hero + the "For sellers / For buyers" section.</span>
         </div>
       </div>
@@ -257,14 +257,14 @@
         <div class="clock">0:26<small>Seller side</small></div>
         <div class="say">
           <q>Here's the seller. To add a product, she just… says it.</q>
-          <span class="action"><b>Show (Scene B — phone):</b> type <b>“Add Ankara Gown, ₦18,500, 12 in stock.”</b> Hive confirms with the listing.</span>
+          <span class="action"><b>Show (Scene B - phone):</b> type <b>“Add Ankara Gown, ₦18,500, 12 in stock.”</b> Hive confirms with the listing.</span>
         </div>
       </div>
 
       <div class="beat">
         <div class="clock">0:36<small>The wow</small></div>
         <div class="say">
-          <q>Or she sends a photo — and Hive's AI writes the listing for her.</q>
+          <q>Or she sends a photo - and Hive's AI writes the listing for her.</q>
           <span class="action"><b>Show:</b> send a product <b>photo</b> in WhatsApp → Hive replies with an auto-drafted name, price prompt.</span>
         </div>
       </div>
@@ -272,7 +272,7 @@
       <div class="beat">
         <div class="clock">0:48<small>Buyer side</small></div>
         <div class="say">
-          <q>Now the customer. Different number, same WhatsApp. She picks a store, browses, and orders — in plain language.</q>
+          <q>Now the customer. Different number, same WhatsApp. She picks a store, browses, and orders - in plain language.</q>
           <span class="action"><b>Show (phone, buyer):</b> tap the store button → <b>“What do you sell?”</b> → <b>“I want 2 Ankara Gowns.”</b> Native quick-reply buttons appear.</span>
         </div>
       </div>
@@ -288,7 +288,7 @@
       <div class="beat">
         <div class="clock">1:16<small>💥 Money shot</small></div>
         <div class="say">
-          <q>…paid. Instantly confirmed in the chat — and watch the merchant's dashboard: revenue, orders, and stock update live, the moment Nomba's webhook lands.</q>
+          <q>…paid. Instantly confirmed in the chat - and watch the merchant's dashboard: revenue, orders, and stock update live, the moment Nomba's webhook lands.</q>
           <span class="action"><b>Split screen (built in the editor):</b> phone clip showing "Payment confirmed" on the left, OBS <b>dashboard clip with revenue/orders ticking up</b> on the right.</span>
         </div>
       </div>
@@ -296,8 +296,8 @@
       <div class="beat">
         <div class="clock">1:34<small>Close</small></div>
         <div class="say">
-          <q>One number. Buy and sell. No app, no dashboard to learn — just chat. Hive, powered by Nomba.</q>
-          <span class="action"><b>Show:</b> end card — logo, <code>hive-nomba-web.vercel.app</code>, GitHub link. Hold 3s.</span>
+          <q>One number. Buy and sell. No app, no dashboard to learn - just chat. Hive, powered by Nomba.</q>
+          <span class="action"><b>Show:</b> end card - logo, <code>hive-nomba-web.vercel.app</code>, GitHub link. Hold 3s.</span>
         </div>
       </div>
 
@@ -311,7 +311,7 @@
       <thead><tr><th>Time</th><th>Beat</th><th>On screen</th></tr></thead>
       <tbody>
         <tr><td class="time">0:00</td><td>Hook / problem</td><td>Landing page hero</td></tr>
-        <tr><td class="time">0:12</td><td>What Hive is</td><td>Landing — both-sides section</td></tr>
+        <tr><td class="time">0:12</td><td>What Hive is</td><td>Landing - both-sides section</td></tr>
         <tr><td class="time">0:26</td><td>Seller adds product</td><td>Phone: text command → confirm</td></tr>
         <tr><td class="time">0:36</td><td>Photo → AI listing</td><td>Phone: send photo → draft</td></tr>
         <tr><td class="time">0:48</td><td>Buyer browses + orders</td><td>Phone: store buttons → order</td></tr>
@@ -328,13 +328,13 @@
     <ol>
       <li>Drop three things into <b>Descript</b> (or CapCut): the <b>iPhone screen recording</b>, the <b>OBS dashboard recording</b>, and the <b>YarnGPT audio</b>. Line the voiceover up to the beats above.</li>
       <li><b>Build the money shot (1:16):</b> place the phone clip and the dashboard clip <b>side by side</b> on screen at the payment moment, and nudge their timing so the dashboard revenue/orders tick up right as the chat says "confirmed." This is your fake-but-flawless split screen.</li>
-      <li><b>Auto-generate captions</b> — many judges watch muted. Keep them on the whole time.</li>
+      <li><b>Auto-generate captions</b> - many judges watch muted. Keep them on the whole time.</li>
       <li>Add short <b>on-screen labels</b> at each beat: "Adding a product", "AI writes the listing", "Buyer pays via Nomba", "Stock updates live".</li>
-      <li>Cut every spinner / cold-start lag / typo. No dead air — keep it moving.</li>
+      <li>Cut every spinner / cold-start lag / typo. No dead air - keep it moving.</li>
       <li>Optional: soft background music at ~15% under the voice. Never louder than the narration.</li>
       <li><b>Export:</b> MP4, 1080p, 30fps. Aim for under 2:00.</li>
     </ol>
-    <div class="callout"><strong>Say "Nomba" out loud and put it on screen</strong> at the payment moment — it's their hackathon; make the sponsor integration unmissable. End on the live URL so judges can click through.</div>
+    <div class="callout"><strong>Say "Nomba" out loud and put it on screen</strong> at the payment moment - it's their hackathon; make the sponsor integration unmissable. End on the live URL so judges can click through.</div>
   </div>
 
   <!-- 9. LINKS -->
@@ -349,7 +349,7 @@
   </div>
 
   <footer>
-    🐝 <b>Hive</b> — buy &amp; sell by chatting. Powered by Nomba.<br/>
+    🐝 <b>Hive</b> - buy &amp; sell by chatting. Powered by Nomba.<br/>
     <span class="noprint muted">Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to save this sheet as a PDF.</span>
   </footer>
 

@@ -234,7 +234,7 @@ const tools: Tool[] = [
     declaration: {
       name: "place_order",
       description:
-        "Create an order for the customer. Provide each item by product name and quantity. This does NOT take payment yet — after it succeeds, ask the customer how they'd like to pay (card link or bank transfer).",
+        "Create an order for the customer. Provide each item by product name and quantity. This does NOT take payment yet - after it succeeds, ask the customer how they'd like to pay (card link or bank transfer).",
       parameters: {
         type: Type.OBJECT,
         properties: {
@@ -284,7 +284,7 @@ const tools: Tool[] = [
     declaration: {
       name: "pay_with_card",
       description:
-        "Use this when the customer chooses to pay by CARD/LINK — e.g. they say 'card', 'pay with card', 'link', or tap 'Pay with card'. Generates a Nomba tap-to-pay link for their order. Omit the reference to use their most recent unpaid order. Do NOT call place_order again.",
+        "Use this when the customer chooses to pay by CARD/LINK - e.g. they say 'card', 'pay with card', 'link', or tap 'Pay with card'. Generates a Nomba tap-to-pay link for their order. Omit the reference to use their most recent unpaid order. Do NOT call place_order again.",
       parameters: {
         type: Type.OBJECT,
         properties: { reference: { type: Type.STRING, description: "Order reference. Optional." } },
@@ -317,7 +317,7 @@ const tools: Tool[] = [
     declaration: {
       name: "pay_with_transfer",
       description:
-        "Use this when the customer chooses to pay by BANK TRANSFER — e.g. they say 'bank transfer', 'transfer', 'send to account', or tap 'Bank transfer'. Creates a dedicated Nomba virtual account for their order and returns the bank account number to transfer to. Omit the reference to use their most recent unpaid order. Do NOT call place_order again.",
+        "Use this when the customer chooses to pay by BANK TRANSFER - e.g. they say 'bank transfer', 'transfer', 'send to account', or tap 'Bank transfer'. Creates a dedicated Nomba virtual account for their order and returns the bank account number to transfer to. Omit the reference to use their most recent unpaid order. Do NOT call place_order again.",
       parameters: {
         type: Type.OBJECT,
         properties: { reference: { type: Type.STRING, description: "Order reference. Optional." } },
@@ -467,7 +467,7 @@ const tools: Tool[] = [
       const order = await getOrderByReference(args.reference);
       if (!order || order.merchantId !== ctx.merchantId) return { ok: false, error: "Order not found." };
       if (order.status === "PAID" || order.status === "FULFILLED")
-        return { ok: false, error: `Order ${order.reference} is already paid — no link needed.` };
+        return { ok: false, error: `Order ${order.reference} is already paid - no link needed.` };
       if (order.status === "CANCELLED") return { ok: false, error: `Order ${order.reference} was cancelled.` };
 
       let link = order.payment?.checkoutUrl ?? null;
@@ -723,7 +723,7 @@ const tools: Tool[] = [
     declaration: {
       name: "get_store_info",
       description:
-        "Get the store's hours, location/address, delivery policy and contact — use this to answer questions like 'where are you?', 'what time do you close?', or 'do you deliver?'.",
+        "Get the store's hours, location/address, delivery policy and contact - use this to answer questions like 'where are you?', 'what time do you close?', or 'do you deliver?'.",
       parameters: { type: Type.OBJECT, properties: {} },
     },
     async execute(_args, ctx) {
@@ -737,7 +737,7 @@ const tools: Tool[] = [
         address: m.address ?? undefined,
         delivery: m.deliveryInfo ?? undefined,
         contact: m.contactInfo ?? undefined,
-        note: "If a field is missing, that info hasn't been set yet — say you'll check, don't invent it.",
+        note: "If a field is missing, that info hasn't been set yet - say you'll check, don't invent it.",
       };
     },
   },
@@ -748,7 +748,7 @@ const tools: Tool[] = [
     declaration: {
       name: "modify_order",
       description:
-        "Change a customer's most recent UNPAID order before they pay — replace its items with this new full list of items and quantities. Does NOT take payment; afterwards ask how they want to pay. Use when they say 'make it 3' or 'add a gele too'.",
+        "Change a customer's most recent UNPAID order before they pay - replace its items with this new full list of items and quantities. Does NOT take payment; afterwards ask how they want to pay. Use when they say 'make it 3' or 'add a gele too'.",
       parameters: {
         type: Type.OBJECT,
         properties: {

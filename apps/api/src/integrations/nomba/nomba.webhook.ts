@@ -30,7 +30,7 @@ export interface NombaEvent {
   type: string;
   /**
    * Every candidate id we can find in the payload. Nomba returns its OWN
-   * orderReference (a UUID) at checkout — different from our HIVE-xxx ref — so we
+   * orderReference (a UUID) at checkout - different from our HIVE-xxx ref - so we
    * collect all of them and let the handler match against either our order
    * reference or the stored Nomba providerRef.
    */

@@ -15,14 +15,14 @@ prisma/*.db-journal
 # TypeScript incremental build info
 *.tsbuildinfo
 
-# Local deploy notes with real secrets — never commit
+# Local deploy notes with real secrets - never commit
 DEPLOY.md
 .env.production*
 
-# Planning / scratch artifacts — not part of the shipped project
+# Planning / scratch artifacts - not part of the shipped project
 *.pdf
 shot*.mjs
 
-# Generated demo voiceover audio (YarnGPT) — local only
+# Generated demo voiceover audio (YarnGPT) - local only
 demo-voiceover/
 *.mp3

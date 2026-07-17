@@ -54,7 +54,7 @@ function extractButtons(text: string): { text: string; buttons?: string[] } {
  */
 export async function runAgent(input: AgentInput): Promise<AgentReply> {
   if (!aiEnabled()) {
-    return { text: "Hive's AI brain isn't configured yet — set GROQ_API_KEY to enable it. (Your message was received.)" };
+    return { text: "Hive's AI brain isn't configured yet - set GROQ_API_KEY to enable it. (Your message was received.)" };
   }
 
   const systemInstruction =
@@ -85,13 +85,13 @@ export async function runAgent(input: AgentInput): Promise<AgentReply> {
       userText = `${input.text ? input.text + "\n\n" : ""}[The user attached a product photo. It shows: ${desc}]`;
     } catch (err) {
       logger.warn({ err }, "vision describe failed");
-      userText = input.text || "(the user sent a photo, but I couldn't read it — ask them to describe it)";
+      userText = input.text || "(the user sent a photo, but I couldn't read it - ask them to describe it)";
     }
   }
   messages.push({ role: "user", content: userText || "(no text)" });
 
   let finalText = "";
-  // Deterministic artifacts pulled straight from tool results — never trust the
+  // Deterministic artifacts pulled straight from tool results - never trust the
   // LLM to reproduce a payment URL verbatim (it will hallucinate it).
   let paymentLink: string | null = null;
 
@@ -126,14 +126,14 @@ export async function runAgent(input: AgentInput): Promise<AgentReply> {
     logger.error({ err: msg }, "agent generation failed");
     if (/rate.?limit|429|tokens per day|TPD/i.test(msg)) {
       const wait = msg.match(/try again in ([\dhms.\s]+?)\./i)?.[1]?.trim();
-      return { text: `🐝 Hive is taking a quick breather (AI usage limit reached${wait ? ` — back in ~${wait}` : ""}). Please try again shortly.` };
+      return { text: `🐝 Hive is taking a quick breather (AI usage limit reached${wait ? ` - back in ~${wait}` : ""}). Please try again shortly.` };
     }
     return { text: "🐝 Sorry, I hit a snag processing that. Please try again in a moment." };
   }
 
   if (!finalText) finalText = "Done.";
 
-  // WhatsApp doesn't render markdown — normalize anything the model emits to plain text.
+  // WhatsApp doesn't render markdown - normalize anything the model emits to plain text.
   finalText = finalText
     .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1") // [label](url) -> label
     .replace(/\*\*(.+?)\*\*/g, "$1") // **bold** -> plain
@@ -161,7 +161,7 @@ export async function runAgent(input: AgentInput): Promise<AgentReply> {
   }
 
   // A payment link becomes a "Pay Now" call-to-action button (the link itself
-  // lives only in the CTA — renderers that can't show a button append it as text).
+  // lives only in the CTA - renderers that can't show a button append it as text).
   const cta = paymentLink ? { label: "Pay Now", url: paymentLink } : undefined;
 
   // Quick-reply buttons the model may have suggested (skipped alongside a payment

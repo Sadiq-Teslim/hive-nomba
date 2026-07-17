@@ -4,7 +4,7 @@ import { env, features } from "../config/env.js";
 /**
  * Thin provider wrapper around Groq (OpenAI-compatible chat completions with tool
  * calling). Isolated here so the rest of the codebase depends on a small
- * interface — swap this file to change LLM providers.
+ * interface - swap this file to change LLM providers.
  */
 
 export type ChatMessage =
@@ -50,7 +50,7 @@ export const aiEnabled = () => features.ai;
 
 /**
  * Vision pass: describe a product photo as plain text. We keep this separate from
- * tool-calling — the vision model is great at seeing but emits tool-call params
+ * tool-calling - the vision model is great at seeing but emits tool-call params
  * with the wrong types (numbers as strings), so we let the text model make the
  * actual tool calls using this description as context.
  */
@@ -86,7 +86,7 @@ export async function describeImage(
  * gpt-oss occasionally leaks a "harmony" channel control token into a tool name
  * (e.g. `raise_support<|channel|>commentary`), which Groq rejects with
  * `tool_use_failed`. It's stochastic, so a plain retry almost always yields a
- * clean call. We only retry this specific validation failure — never rate limits.
+ * clean call. We only retry this specific validation failure - never rate limits.
  */
 function isToolValidationError(err: unknown): boolean {
   const msg = String((err as { message?: string })?.message ?? err);

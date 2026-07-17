@@ -15,7 +15,7 @@ interface State extends DashboardData {
 
 /**
  * Loads and live-refreshes a merchant's dashboard data. Polls every `intervalMs`
- * so payments coming in over WhatsApp appear on screen within seconds — real
+ * so payments coming in over WhatsApp appear on screen within seconds - real
  * data, straight from the API.
  */
 export function useDashboard(merchantId: string | null, intervalMs = 4000) {

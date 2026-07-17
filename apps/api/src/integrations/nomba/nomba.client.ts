@@ -65,10 +65,10 @@ export interface CreateCheckoutInput {
 
 export async function createCheckout(input: CreateCheckoutInput): Promise<CheckoutResult> {
   if (!features.nomba) {
-    // Mock mode — lets the demo run without live credentials.
+    // Mock mode - lets the demo run without live credentials.
     const providerRef = `MOCK-${input.orderReference}`;
     const checkoutUrl = `${env.PUBLIC_BASE_URL}/mock/checkout/${input.orderReference}`;
-    logger.warn({ orderReference: input.orderReference }, "Nomba not configured — returning mock checkout link");
+    logger.warn({ orderReference: input.orderReference }, "Nomba not configured - returning mock checkout link");
     return { checkoutUrl, providerRef, mocked: true };
   }
 
@@ -93,7 +93,7 @@ export async function createCheckout(input: CreateCheckoutInput): Promise<Checko
     },
   );
 
-  // Nomba returns HTTP 200 even for business errors — the real status is in `code`.
+  // Nomba returns HTTP 200 even for business errors - the real status is in `code`.
   if (res.data?.code && res.data.code !== "00") {
     logger.error({ body: res.data }, "Nomba checkout business error");
     throw new Error(`Nomba: ${res.data.description ?? res.data.code}`);
@@ -123,7 +123,7 @@ export interface CheckoutStatus {
 
 /**
  * Actively query Nomba for an order's payment status, using OUR order reference
- * (the one we sent at checkout, e.g. HIVE-7Q2K9F — Nomba echoes it as
+ * (the one we sent at checkout, e.g. HIVE-7Q2K9F - Nomba echoes it as
  * `orderReference`). This is our source of truth for reconciliation: we don't
  * rely on webhooks alone, since they can be unconfigured or dropped (esp. sandbox).
  *

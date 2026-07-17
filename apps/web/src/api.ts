@@ -1,4 +1,4 @@
-// Typed client for the Hive dashboard API. All data here is real — served by
+// Typed client for the Hive dashboard API. All data here is real - served by
 // @hive/api from the same Postgres the WhatsApp agent writes to.
 
 export interface Merchant {

@@ -14,7 +14,7 @@ export const nombaRouter = Router();
  *
  * Trust model (robust against signature-scheme uncertainty):
  *  1. Compute the HMAC signature as a trust signal (don't hard-reject on mismatch).
- *  2. Re-verify the payment against Nomba's API — that's our source of truth, so a
+ *  2. Re-verify the payment against Nomba's API - that's our source of truth, so a
  *     forged webhook can never fake a payment, and a mismatched signature scheme
  *     can never drop a real one.
  *  3. If the API can't confirm yet (e.g. it lags the webhook) but the signature IS
@@ -66,13 +66,13 @@ nombaRouter.post("/webhooks/nomba", async (req, res) => {
       return;
     }
 
-    // API couldn't confirm yet — trust the webhook only if its signature checked out.
+    // API couldn't confirm yet - trust the webhook only if its signature checked out.
     if (signatureValid) {
       logger.info({ ref: order.reference }, "Nomba webhook: signed event trusted (API not yet confirming)");
       await markOrderPaid(order.id, event.references[0], body);
       await notifyOrderPaid(order.id);
     } else {
-      logger.warn({ ref: order.reference }, "Nomba webhook: unconfirmed by API and bad/absent signature — ignoring");
+      logger.warn({ ref: order.reference }, "Nomba webhook: unconfirmed by API and bad/absent signature - ignoring");
     }
   } catch (err) {
     logger.error({ err }, "Nomba webhook handling failed");

@@ -73,7 +73,7 @@ export default function App({ onOpenSimulator }: { onOpenSimulator: () => void }
           <section id="dashboard" className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <KpiCard
               label="Revenue"
-              value={a ? naira(a.revenueKobo) : "—"}
+              value={a ? naira(a.revenueKobo) : "-"}
               hint={a ? `Last ${a.windowDays} days` : undefined}
               icon={MoneyBag01Icon}
               accent="honey"
@@ -82,7 +82,7 @@ export default function App({ onOpenSimulator }: { onOpenSimulator: () => void }
             />
             <KpiCard
               label="Paid Orders"
-              value={a ? String(a.orderCount) : "—"}
+              value={a ? String(a.orderCount) : "-"}
               hint={a ? `${a.pendingOrders} awaiting payment` : undefined}
               icon={ShoppingCart01Icon}
               accent="mint"
@@ -91,7 +91,7 @@ export default function App({ onOpenSimulator }: { onOpenSimulator: () => void }
             />
             <KpiCard
               label="Avg Order Value"
-              value={a ? naira(a.avgOrderKobo) : "—"}
+              value={a ? naira(a.avgOrderKobo) : "-"}
               hint="Per paid order"
               icon={CreditCardIcon}
               accent="sky"
@@ -99,7 +99,7 @@ export default function App({ onOpenSimulator }: { onOpenSimulator: () => void }
             />
             <KpiCard
               label="Customers"
-              value={a ? String(a.totalCustomers) : "—"}
+              value={a ? String(a.totalCustomers) : "-"}
               hint={a ? `${a.totalProducts} products listed` : undefined}
               icon={UserMultipleIcon}
               accent="violet"
@@ -117,7 +117,7 @@ export default function App({ onOpenSimulator }: { onOpenSimulator: () => void }
                 </div>
                 <span className="text-xs text-slate-500">Last 14 days</span>
               </div>
-              <div className="text-2xl font-bold text-white">{a ? naira(a.revenueKobo) : "—"}</div>
+              <div className="text-2xl font-bold text-white">{a ? naira(a.revenueKobo) : "-"}</div>
               <div className="mt-3">
                 <RevenueChart data={series} />
               </div>

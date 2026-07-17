@@ -4,7 +4,7 @@ import { env } from "../../config/env.js";
 import { logger } from "../../config/logger.js";
 
 /**
- * Twilio WhatsApp client. Much faster to stand up than Meta — the Twilio Sandbox
+ * Twilio WhatsApp client. Much faster to stand up than Meta - the Twilio Sandbox
  * gives you a working WhatsApp number in minutes.
  *
  * Twilio addresses are `whatsapp:+<E164>`. Internally Hive stores bare digits
