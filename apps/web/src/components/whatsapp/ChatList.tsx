@@ -21,7 +21,7 @@ export function ChatList({ personas, threads, selectedPhone, onSelect, onOpenDas
         <div className="flex items-center gap-2">
           <span className="text-lg font-semibold">Chats</span>
           <span className="rounded bg-wa-accent/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-wa-accent">
-            Hive
+            Simulator
           </span>
         </div>
         <div className="flex items-center gap-5 text-wa-sub">

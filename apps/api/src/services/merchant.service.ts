@@ -20,13 +20,23 @@ export async function listStores() {
   return prisma.merchant.findMany({
     where: { onboarded: true, businessName: { not: null } },
     orderBy: { createdAt: "asc" },
-    select: { id: true, businessName: true, category: true },
+    select: { id: true, businessName: true, category: true, storefrontSlug: true, storefrontCode: true },
   });
 }
 
 /** Resolve a store by (fuzzy) business name. */
 export async function findStoreByName(name: string) {
   const trimmed = name.trim();
+  const upper = trimmed.toUpperCase();
+  const direct = await prisma.merchant.findFirst({
+    where: {
+      onboarded: true,
+      OR: [{ storefrontCode: upper }, { storefrontSlug: trimmed.toLowerCase() }],
+    },
+    orderBy: { createdAt: "asc" },
+  });
+  if (direct) return direct;
+
   return prisma.merchant.findFirst({
     where: { onboarded: true, businessName: { contains: trimmed, mode: "insensitive" } },
     orderBy: { createdAt: "asc" },

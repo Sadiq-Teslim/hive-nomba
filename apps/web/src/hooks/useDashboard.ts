@@ -1,10 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { api, type Order, type Overview, type Product } from "../api";
+import { api, type Dispute, type Handover, type Order, type Overview, type Product, type RiskEvent, type SetupStatus } from "../api";
 
 export interface DashboardData {
   overview: Overview | null;
+  setup: SetupStatus | null;
   products: Product[];
   orders: Order[];
+  riskEvents: RiskEvent[];
+  disputes: Dispute[];
+  handovers: Handover[];
 }
 
 interface State extends DashboardData {
@@ -21,8 +25,12 @@ interface State extends DashboardData {
 export function useDashboard(merchantId: string | null, intervalMs = 4000) {
   const [state, setState] = useState<State>({
     overview: null,
+    setup: null,
     products: [],
     orders: [],
+    riskEvents: [],
+    disputes: [],
+    handovers: [],
     loading: true,
     error: null,
     lastUpdated: null,
@@ -35,12 +43,16 @@ export function useDashboard(merchantId: string | null, intervalMs = 4000) {
       if (!merchantId) return;
       if (!silent) setState((s) => ({ ...s, loading: true }));
       try {
-        const [overview, products, orders] = await Promise.all([
+        const [overview, setup, products, orders, riskEvents, disputes, handovers] = await Promise.all([
           api.overview(merchantId),
+          api.setup(merchantId),
           api.products(merchantId),
           api.orders(merchantId),
+          api.riskEvents(merchantId),
+          api.disputes(merchantId),
+          api.handovers(merchantId),
         ]);
-        setState({ overview, products, orders, loading: false, error: null, lastUpdated: new Date() });
+        setState({ overview, setup, products, orders, riskEvents, disputes, handovers, loading: false, error: null, lastUpdated: new Date() });
       } catch (e) {
         setState((s) => ({
           ...s,

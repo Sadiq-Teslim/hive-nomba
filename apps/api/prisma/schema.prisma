@@ -16,6 +16,9 @@ datasource db {
 model Merchant {
   id            String   @id @default(cuid())
   whatsappPhone String   @unique // E.164, e.g. 2348012345678
+  accountPhone  String?
+  email         String?  @unique
+  passwordHash  String?
   businessName  String?
   ownerName     String?
   category      String? // fashion, food, electronics, pharmacy, salon, etc.
@@ -27,6 +30,31 @@ model Merchant {
   deliveryInfo  String? // freeform, e.g. "We deliver in Lagos, ₦2,000 flat"
   contactInfo   String? // phone/email/handle to reach the business
   about         String? // short description / bio
+  businessPhone String?
+  cityState     String?
+  deliveryOption DeliveryOption?
+  deliveryLocations String?
+  returnPolicy  String?
+  cacRegistrationNumber String?
+  logoUrl       String?
+  settlementBankName String?
+  settlementAccountNumber String?
+  settlementAccountName String?
+  settlementStatus SettlementStatus @default(PENDING)
+  verificationStatus VerificationStatus @default(UNVERIFIED)
+  emailVerified Boolean @default(false)
+  phoneVerified Boolean @default(false)
+  identityVerified Boolean @default(false)
+  bankVerified Boolean @default(false)
+  businessRegistrationVerified Boolean @default(false)
+  trustLevel MerchantTrustLevel @default(NEW)
+  storefrontSlug String? @unique
+  storefrontCode String? @unique
+  customerGreeting String?
+  whatsappConnectionStatus WhatsAppConnectionStatus @default(NOT_CONNECTED)
+  whatsappConnectedAt DateTime?
+  setupState MerchantSetupState @default(AWAITING_ACTIVATION)
+  activationCodeGeneratedAt DateTime?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -35,8 +63,31 @@ model Merchant {
   orders        Order[]
   conversations Conversation[]
   supportTickets SupportTicket[]
+  activationCodes ActivationCode[]
+  riskEvents RiskEvent[]
+  auditLogs AuditLog[]
+  disputes Dispute[]
+  handovers HumanHandover[]
+  sessions MerchantSession[]
 
   @@index([whatsappPhone])
+  @@index([storefrontSlug])
+  @@index([storefrontCode])
+  @@index([verificationStatus])
+  @@index([whatsappConnectionStatus])
+}
+
+model MerchantSession {
+  id         String   @id @default(cuid())
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  tokenHash  String   @unique
+  expiresAt  DateTime
+  lastUsedAt DateTime?
+  createdAt  DateTime @default(now())
+
+  @@index([merchantId])
+  @@index([expiresAt])
 }
 
 // ───────────────────────────── Product ──────────────────────────────
@@ -74,6 +125,8 @@ model Customer {
   orders        Order[]
   conversations Conversation[]
   supportTickets SupportTicket[]
+  disputes      Dispute[]
+  handovers     HumanHandover[]
 
   @@unique([merchantId, whatsappPhone])
   @@index([merchantId])
@@ -84,9 +137,94 @@ enum OrderStatus {
   DRAFT // being assembled in conversation
   PENDING_PAYMENT // payment issued, awaiting payment
   PAID // payment confirmed
+  ACCEPTED
+  PROCESSING
+  READY_FOR_PICKUP
+  DISPATCHED
+  DELIVERED
   FULFILLED
   CANCELLED
+  REFUND_REQUESTED
   REFUNDED // paid order refunded/returned
+  DISPUTED
+}
+
+enum VerificationStatus {
+  UNVERIFIED
+  PENDING
+  VERIFIED
+  REJECTED
+  SUSPENDED
+}
+
+enum MerchantTrustLevel {
+  NEW
+  VERIFIED
+  TRUSTED
+  RESTRICTED
+  SUSPENDED
+}
+
+enum WhatsAppConnectionStatus {
+  NOT_CONNECTED
+  WAITING_FOR_ACTIVATION
+  CONNECTED
+  CODE_EXPIRED
+  CONNECTION_FAILED
+}
+
+enum MerchantSetupState {
+  AWAITING_ACTIVATION
+  CONFIRMING_BUSINESS
+  CONFIGURING_FULFILMENT
+  CONFIGURING_POLICY
+  READY_TO_ADD_PRODUCT
+  ACTIVE
+}
+
+enum DeliveryOption {
+  DELIVERY
+  PICKUP
+  BOTH
+}
+
+enum SettlementStatus {
+  PENDING
+  ELIGIBLE
+  PROCESSING
+  SETTLED
+  HELD_FOR_REVIEW
+  REVERSED
+}
+
+enum RiskSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum RiskEventStatus {
+  OPEN
+  REVIEWING
+  RESOLVED
+  DISMISSED
+}
+
+enum DisputeStatus {
+  OPEN
+  AWAITING_MERCHANT
+  UNDER_REVIEW
+  RESOLVED_FOR_BUYER
+  RESOLVED_FOR_MERCHANT
+  CLOSED
+}
+
+enum HumanHandoverStatus {
+  REQUESTED
+  ACTIVE
+  RETURNED_TO_HIVE
+  CLOSED
 }
 
 model Order {
@@ -98,14 +236,25 @@ model Order {
   customer   Customer?   @relation(fields: [customerId], references: [id], onDelete: SetNull)
   status     OrderStatus @default(DRAFT)
   totalKobo  Int         @default(0)
+  fulfilmentNote String?
+  dispatchCarrier String?
+  dispatchTrackingRef String?
+  deliveryAddress String?
+  acceptedAt DateTime?
+  dispatchedAt DateTime?
+  deliveredAt DateTime?
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
 
   items   OrderItem[]
   payment Payment?
+  disputes Dispute[]
+  statusEvents OrderStatusEvent[]
 
   @@index([merchantId])
   @@index([customerId])
+  @@index([merchantId, reference])
+  @@index([merchantId, status])
 }
 
 model OrderItem {
@@ -145,7 +294,7 @@ model Payment {
   status        PaymentStatus @default(PENDING)
   checkoutUrl   String? // Nomba payment link URL (LINK method)
   providerRef   String? // Nomba order/transaction reference
-  txnId         String? // Nomba transaction id (for refunds)
+  txnId         String?       @unique // Nomba transaction id (for refunds / idempotency)
   vaNumber      String? // virtual account number (VIRTUAL_ACCOUNT method)
   vaBank        String? // virtual account bank name
   vaName        String? // virtual account holder name
@@ -154,6 +303,7 @@ model Payment {
   refundedAt    DateTime?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
+  events        PaymentEvent[]
 
   @@index([providerRef])
 }
@@ -196,12 +346,13 @@ model Conversation {
   customer   Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
   party      Party
   phone      String // the WhatsApp number this thread belongs to
+  scopeKey   String   @default("LOBBY") // merchant id, or LOBBY before a store is chosen
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
   messages Message[]
 
-  @@unique([phone, party])
+  @@unique([scopeKey, phone, party])
   @@index([merchantId])
 }
 
@@ -222,4 +373,143 @@ model Message {
   createdAt      DateTime     @default(now())
 
   @@index([conversationId])
+}
+
+model ActivationCode {
+  id          String   @id @default(cuid())
+  merchantId  String
+  merchant    Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  codeHash    String   @unique
+  codePreview String
+  expiresAt   DateTime
+  usedAt      DateTime?
+  usedByPhone String?
+  attempts    Int      @default(0)
+  lastAttemptAt DateTime?
+  createdAt   DateTime @default(now())
+
+  @@index([merchantId])
+  @@index([expiresAt])
+  @@index([usedByPhone])
+}
+
+model BuyerSession {
+  id          String   @id @default(cuid())
+  merchantId  String
+  customerId  String?
+  phone       String
+  storeCode   String?
+  activeCart  Json?
+  lastIntent  String?
+  responder   String   @default("HIVE")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([merchantId, phone])
+  @@index([phone])
+  @@index([merchantId])
+}
+
+model OrderStatusEvent {
+  id          String      @id @default(cuid())
+  orderId     String
+  order       Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  fromStatus  OrderStatus?
+  toStatus    OrderStatus
+  actorType   String
+  actorId     String?
+  note        String?
+  createdAt   DateTime    @default(now())
+
+  @@index([orderId])
+}
+
+model PaymentEvent {
+  id          String   @id @default(cuid())
+  paymentId   String
+  payment     Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  eventType   String
+  providerRef String?
+  txnId       String?
+  raw         Json?
+  createdAt   DateTime @default(now())
+
+  @@index([paymentId])
+  @@index([providerRef])
+  @@index([txnId])
+}
+
+model Dispute {
+  id          String        @id @default(cuid())
+  merchantId  String
+  merchant    Merchant      @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  customerId  String?
+  customer    Customer?     @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  orderId     String?
+  order       Order?        @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  reason      String
+  description String?
+  evidenceUrl String?
+  status      DisputeStatus @default(OPEN)
+  resolution  String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([merchantId])
+  @@index([merchantId, status])
+  @@index([orderId])
+}
+
+model RiskEvent {
+  id          String          @id @default(cuid())
+  merchantId  String
+  merchant    Merchant        @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  eventType   String
+  severity    RiskSeverity    @default(LOW)
+  reason      String
+  metadata    Json?
+  status      RiskEventStatus @default(OPEN)
+  reviewedBy  String?
+  createdAt   DateTime        @default(now())
+  resolvedAt  DateTime?
+
+  @@index([merchantId])
+  @@index([merchantId, status])
+  @@index([severity])
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  merchantId  String?
+  merchant    Merchant? @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  actorType   String
+  actorId     String?
+  action      String
+  metadata    Json?
+  ipAddress   String?
+  createdAt   DateTime @default(now())
+
+  @@index([merchantId])
+  @@index([action])
+  @@index([actorId])
+  @@index([createdAt])
+}
+
+model HumanHandover {
+  id          String              @id @default(cuid())
+  merchantId  String
+  merchant    Merchant            @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  customerId  String?
+  customer    Customer?           @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  phone       String
+  reason      String
+  status      HumanHandoverStatus @default(REQUESTED)
+  activeBy    String?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  closedAt    DateTime?
+
+  @@index([merchantId])
+  @@index([merchantId, status])
+  @@index([phone])
 }

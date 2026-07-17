@@ -17,15 +17,32 @@ export interface RaiseTicketInput {
  * WhatsApp so a human can step in. Returns the ticket.
  */
 export async function raiseTicket(input: RaiseTicketInput) {
-  const ticket = await prisma.supportTicket.create({
-    data: {
-      merchantId: input.merchantId,
-      customerId: input.customerId,
-      phone: input.phone,
-      category: input.category ?? "complaint",
-      message: input.message,
-      orderRef: input.orderRef,
-    },
+  const ticket = await prisma.$transaction(async (tx) => {
+    const created = await tx.supportTicket.create({
+      data: {
+        merchantId: input.merchantId,
+        customerId: input.customerId,
+        phone: input.phone,
+        category: input.category ?? "complaint",
+        message: input.message,
+        orderRef: input.orderRef,
+      },
+    });
+    const openHandover = await tx.humanHandover.findFirst({
+      where: { merchantId: input.merchantId, phone: input.phone, status: { in: ["REQUESTED", "ACTIVE"] } },
+    });
+    if (!openHandover) {
+      await tx.humanHandover.create({
+        data: {
+          merchantId: input.merchantId,
+          customerId: input.customerId,
+          phone: input.phone,
+          reason: input.message,
+          status: "REQUESTED",
+        },
+      });
+    }
+    return created;
   });
 
   const merchant = await getMerchant(input.merchantId);

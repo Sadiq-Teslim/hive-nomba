@@ -8,6 +8,7 @@ import { nombaRouter } from "./routes/nomba.routes.js";
 import { mockRouter } from "./routes/mock.routes.js";
 import { payRouter } from "./routes/pay.routes.js";
 import { dashboardRouter } from "./routes/dashboard.routes.js";
+import { onboardingRouter } from "./routes/onboarding.routes.js";
 import { notFound, errorHandler } from "./middleware/error.js";
 
 export function createApp() {
@@ -27,6 +28,7 @@ export function createApp() {
   app.use("/api", whatsappRouter);
   app.use("/api", twilioRouter);
   app.use("/api", nombaRouter);
+  app.use("/api", onboardingRouter);
   app.use("/api/dashboard", dashboardRouter);
   app.use("/", mockRouter);
   app.use("/", payRouter);

@@ -13,6 +13,8 @@ const prisma = new PrismaClient();
 
 interface StoreSeed {
   phone: string;
+  slug: string;
+  code: string;
   businessName: string;
   ownerName: string;
   category: string;
@@ -27,6 +29,8 @@ interface StoreSeed {
 const STORES: StoreSeed[] = [
   {
     phone: "2348100000001",
+    slug: "bellas-fashion-hub",
+    code: "SHOP-BELLA1",
     businessName: "Bella's Fashion Hub",
     ownerName: "Bella",
     category: "fashion",
@@ -45,6 +49,8 @@ const STORES: StoreSeed[] = [
   },
   {
     phone: "2348100000002",
+    slug: "mama-nkechis-kitchen",
+    code: "SHOP-NKECHI",
     businessName: "Mama Nkechi's Kitchen",
     ownerName: "Nkechi",
     category: "food",
@@ -64,6 +70,8 @@ const STORES: StoreSeed[] = [
   },
   {
     phone: "2348100000003",
+    slug: "techbox-gadgets",
+    code: "SHOP-TECHBX",
     businessName: "TechBox Gadgets",
     ownerName: "Tunde",
     category: "electronics",
@@ -85,6 +93,15 @@ const STORES: StoreSeed[] = [
 
 async function main() {
   // Reset (delete in FK-safe order).
+  await prisma.paymentEvent.deleteMany();
+  await prisma.orderStatusEvent.deleteMany();
+  await prisma.dispute.deleteMany();
+  await prisma.humanHandover.deleteMany();
+  await prisma.riskEvent.deleteMany();
+  await prisma.auditLog.deleteMany();
+  await prisma.activationCode.deleteMany();
+  await prisma.buyerSession.deleteMany();
+  await prisma.merchantSession.deleteMany();
   await prisma.supportTicket.deleteMany();
   await prisma.message.deleteMany();
   await prisma.conversation.deleteMany();
@@ -109,6 +126,15 @@ async function main() {
         deliveryInfo: s.deliveryInfo,
         contactInfo: s.contactInfo,
         onboarded: true,
+        storefrontSlug: s.slug,
+        storefrontCode: s.code,
+        customerGreeting: `Hi, I'm Hive, ${s.businessName}'s automated shopping assistant. What would you like to buy today?`,
+        verificationStatus: "VERIFIED",
+        trustLevel: "VERIFIED",
+        phoneVerified: true,
+        whatsappConnectionStatus: "CONNECTED",
+        whatsappConnectedAt: new Date(),
+        setupState: "ACTIVE",
         products: {
           create: s.products.map((p) => ({
             name: p.name,
@@ -123,7 +149,7 @@ async function main() {
   }
 
   console.log("\nMerchant phones: chat from one of these to manage that store.");
-  console.log("Any other number → customer of the most recent onboarded store.");
+  console.log("Buyers can choose a store by name, link, or SHOP code.");
 }
 
 main()
