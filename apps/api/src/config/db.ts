@@ -26,7 +26,7 @@ function createClient() {
           } catch (err) {
             lastErr = err;
             if (isTransient(err) && attempt < maxAttempts) {
-              logger.warn({ attempt }, "Transient DB error — retrying (Neon may be waking up)");
+              logger.warn({ attempt }, "Transient DB error - retrying (Neon may be waking up)");
               await sleep(400 * attempt);
               continue;
             }

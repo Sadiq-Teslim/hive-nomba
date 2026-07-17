@@ -10,7 +10,7 @@ export const twilioRouter = Router();
 /**
  * Twilio WhatsApp inbound webhook (form-urlencoded). We acknowledge immediately
  * with empty TwiML, then process asynchronously and send the reply via the REST
- * API — the agent can take a few seconds, longer than Twilio's request window.
+ * API - the agent can take a few seconds, longer than Twilio's request window.
  *
  * Configure this URL in the Twilio Console (Messaging → WhatsApp Sandbox →
  * "When a message comes in"): https://<tunnel>/api/webhooks/twilio

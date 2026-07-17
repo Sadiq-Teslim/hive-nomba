@@ -28,8 +28,8 @@ const schema = z.object({
   TWILIO_AUTH_TOKEN: z.string().default(""),
   // The WhatsApp-enabled sender, e.g. "whatsapp:+14155238886" (Twilio sandbox).
   TWILIO_WHATSAPP_FROM: z.string().default(""),
-  // Validate inbound X-Twilio-Signature. Off by default — tricky behind tunnels.
-  // (Plain z.coerce.boolean() treats "false" as true — parse the string explicitly.)
+  // Validate inbound X-Twilio-Signature. Off by default - tricky behind tunnels.
+  // (Plain z.coerce.boolean() treats "false" as true - parse the string explicitly.)
   TWILIO_VALIDATE_SIGNATURE: z
     .string()
     .default("false")
@@ -42,9 +42,9 @@ const schema = z.object({
   NOMBA_BASE_URL: z.string().default("https://api.nomba.com"),
   NOMBA_CLIENT_ID: z.string().default(""),
   NOMBA_PRIVATE_KEY: z.string().default(""),
-  // Parent (main) account ID — sent in the `accountId` header for auth.
+  // Parent (main) account ID - sent in the `accountId` header for auth.
   NOMBA_ACCOUNT_ID: z.string().default(""),
-  // Sub-account ID — the account calls are scoped/settled to.
+  // Sub-account ID - the account calls are scoped/settled to.
   NOMBA_SUB_ACCOUNT_ID: z.string().default(""),
   NOMBA_WEBHOOK_SECRET: z.string().default(""),
 

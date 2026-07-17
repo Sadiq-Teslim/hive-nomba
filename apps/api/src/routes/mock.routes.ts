@@ -4,7 +4,7 @@ import { notifyOrderPaid } from "../services/notify.service.js";
 import { formatNaira } from "../utils/money.js";
 
 /**
- * Mock Nomba checkout — only used when Nomba credentials are absent. Lets you
+ * Mock Nomba checkout - only used when Nomba credentials are absent. Lets you
  * complete the payment loop locally: open the link, click Pay, and the order is
  * marked paid exactly as a real webhook would do it.
  */
@@ -15,13 +15,13 @@ mockRouter.get("/mock/checkout/:reference", async (req, res) => {
   if (!order) return res.status(404).send("Order not found");
 
   const items = order.items
-    .map((i) => `<li>${i.quantity} × ${i.nameSnapshot} — ${formatNaira(i.priceKobo * i.quantity)}</li>`)
+    .map((i) => `<li>${i.quantity} × ${i.nameSnapshot} - ${formatNaira(i.priceKobo * i.quantity)}</li>`)
     .join("");
   const paid = order.status === "PAID" || order.status === "FULFILLED";
 
   res.type("html").send(`<!doctype html>
 <html><head><meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Hive Checkout — ${order.reference}</title>
+<title>Hive Checkout - ${order.reference}</title>
 <style>
   body{font-family:system-ui,sans-serif;background:#0f1115;color:#e8e8e8;display:flex;min-height:100vh;align-items:center;justify-content:center;margin:0}
   .card{background:#181b22;border:1px solid #262b36;border-radius:16px;padding:28px;max-width:380px;width:90%}
@@ -39,7 +39,7 @@ mockRouter.get("/mock/checkout/:reference", async (req, res) => {
   <div class="total">${formatNaira(order.totalKobo)}</div>
   ${
     paid
-      ? `<p class="paid">✅ Paid — thank you!</p>`
+      ? `<p class="paid">✅ Paid - thank you!</p>`
       : `<form method="POST" action="/mock/checkout/${order.reference}/pay"><button type="submit">Pay ${formatNaira(order.totalKobo)}</button></form>`
   }
 </div></body></html>`);

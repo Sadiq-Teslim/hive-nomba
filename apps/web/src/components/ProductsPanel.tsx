@@ -21,7 +21,7 @@ export function ProductsPanel({ products }: { products: Product[] }) {
 
       {products.length === 0 ? (
         <p className="px-5 py-12 text-center text-xs text-slate-500">
-          No products yet — the merchant can add them by chatting with Hive on WhatsApp.
+          No products yet - the merchant can add them by chatting with Hive on WhatsApp.
         </p>
       ) : (
         <div className="grid grid-cols-1 gap-3 p-5 sm:grid-cols-2 xl:grid-cols-3">

@@ -17,7 +17,7 @@ export async function sendPromotion(opts: {
   days?: number;
 }): Promise<{ sent: number; audience: PromotionAudience }> {
   const merchant = await getMerchant(opts.merchantId);
-  const signature = merchant?.businessName ? `\n\n— ${merchant.businessName}` : "";
+  const signature = merchant?.businessName ? `\n\n- ${merchant.businessName}` : "";
 
   const recipients =
     opts.audience === "inactive"

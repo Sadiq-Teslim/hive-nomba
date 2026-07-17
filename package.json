@@ -2,7 +2,7 @@
   "name": "hive",
   "version": "0.1.0",
   "private": true,
-  "description": "Hive — the first AI employee for African SMEs. Runs a merchant's business through WhatsApp, powered by Nomba.",
+  "description": "Hive - the first AI employee for African SMEs. Runs a merchant's business through WhatsApp, powered by Nomba.",
   "packageManager": "pnpm@10.28.1",
   "scripts": {
     "dev": "pnpm --filter @hive/api dev",

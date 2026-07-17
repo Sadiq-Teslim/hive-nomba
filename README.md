@@ -2,9 +2,9 @@
 
 # 🐝 Hive
 
-### The first AI employee for African SMEs — buy and sell entirely by chatting on WhatsApp.
+### The first AI employee for African SMEs - buy and sell entirely by chatting on WhatsApp.
 
-Merchants run their whole business by chatting. Customers browse, order, and pay — without ever leaving the chat.
+Merchants run their whole business by chatting. Customers browse, order, and pay - without ever leaving the chat.
 **[Nomba](https://nomba.com)** is the money engine underneath it all.
 
 <br/>
@@ -25,7 +25,7 @@ Merchants run their whole business by chatting. Customers browse, order, and pay
 
 ## The problem
 
-Millions of African traders already run their entire business inside **WhatsApp** — DMs
+Millions of African traders already run their entire business inside **WhatsApp** - DMs
 for orders, screenshots for prices, "I've sent it" for payments. It works, but it doesn't
 scale: no catalogue, no stock tracking, no payment confirmation, no records. Existing
 e-commerce tools ask them to abandon the channel they and their customers actually live in,
@@ -42,24 +42,24 @@ sides of a real business:
 
 ### 🛍️ For sellers
 
-Chat to run the shop — no app, no dashboard to learn.
+Chat to run the shop - no app, no dashboard to learn.
 
-- *"Add Ankara Gown, ₦18,500, 12 in stock"* — or just **send a photo** and Hive drafts the listing with AI vision.
+- *"Add Ankara Gown, ₦18,500, 12 in stock"* - or just **send a photo** and Hive drafts the listing with AI vision.
 - *"How are my sales?"* → revenue, top products, order status.
 - Auto-updates stock, confirms payments, and writes the receipt.
-- Every order and naira is recorded — a real ledger, built by talking.
+- Every order and naira is recorded - a real ledger, built by talking.
 
 </td>
 <td width="50%" valign="top">
 
 ### 🛒 For buyers
 
-Shop and pay in the same chat — no app, no card typed into a random site.
+Shop and pay in the same chat - no app, no card typed into a random site.
 
 - Pick a store, browse products, place an order in plain language.
 - Hive replies with **native WhatsApp buttons** and a real **Nomba** payment link.
 - Pay by card or transfer → instant confirmation right in the thread.
-- Order status, receipts, and support — all in one conversation.
+- Order status, receipts, and support - all in one conversation.
 
 </td>
 </tr>
@@ -75,15 +75,15 @@ Shop and pay in the same chat — no app, no card typed into a random site.
 
 <img src="docs/screenshots/whatsapp.png" alt="Hive buyer flow on WhatsApp" width="380"/>
 
-<sub>A customer picks a store from native quick-reply buttons, orders, and gets a live Nomba payment link — all inside WhatsApp.</sub>
+<sub>A customer picks a store from native quick-reply buttons, orders, and gets a live Nomba payment link - all inside WhatsApp.</sub>
 
 <br/><br/>
 
-### The live merchant dashboard — updates the instant a WhatsApp payment lands
+### The live merchant dashboard - updates the instant a WhatsApp payment lands
 
 ![Hive merchant dashboard](docs/screenshots/dashboard.png)
 
-<sub>Revenue, order-status breakdown, top products and recent orders. Read-only companion to the chat — the phone is the product. Auto-refreshes every 4s.</sub>
+<sub>Revenue, order-status breakdown, top products and recent orders. Read-only companion to the chat - the phone is the product. Auto-refreshes every 4s.</sub>
 
 </div>
 
@@ -91,7 +91,7 @@ Shop and pay in the same chat — no app, no card typed into a random site.
 
 ## Powered by Nomba 💚
 
-Nomba isn't a bolt-on — it's the financial spine that makes a *conversation* into a
+Nomba isn't a bolt-on - it's the financial spine that makes a *conversation* into a
 *transaction*:
 
 | Capability | How Hive uses it |
@@ -101,7 +101,7 @@ Nomba isn't a bolt-on — it's the financial spine that makes a *conversation* i
 | **Active verification** | Hive also polls Nomba (`/v1/transactions/accounts`) by order reference, so a payment confirms even if a webhook is delayed. |
 | **Virtual accounts & refunds** | Wired for pay-by-transfer and reversals on Nomba's sandbox. |
 
-> Running on the **Nomba sandbox** — no real money moves. Card `5434621074252808`, PIN `1234`, OTP `9999` completes a test payment end-to-end.
+> Running on the **Nomba sandbox** - no real money moves. Card `5434621074252808`, PIN `1234`, OTP `9999` completes a test payment end-to-end.
 
 ---
 
@@ -122,7 +122,7 @@ apps/
 ```
 
 **The agent actually does the work.** Groq (`gpt-oss-20b`) drives a ~20-tool function-calling
-loop that creates products, places orders, mints payment links and reads analytics — not a
+loop that creates products, places orders, mints payment links and reads analytics - not a
 chatbot that talks *about* the shop, an employee that *runs* it. Product photos route to a
 vision model (`llama-4-scout`) that drafts the listing. One number serves both roles: Hive
 routes each sender to the merchant console or the customer storefront automatically.
@@ -154,17 +154,17 @@ pnpm dev:all                  # API → :4000 · Dashboard → :5173 · Simulato
 |---|---|---|
 | `DATABASE_URL` | always | Local Postgres or a free [Neon](https://neon.tech). |
 | `GROQ_API_KEY` | the AI | Free at [console.groq.com/keys](https://console.groq.com/keys). |
-| `TWILIO_*` / `WHATSAPP_*` | live WhatsApp | Optional — mock-logs replies when absent. |
-| `NOMBA_*` | live payments | Optional — uses mock checkout when absent. |
+| `TWILIO_*` / `WHATSAPP_*` | live WhatsApp | Optional - mock-logs replies when absent. |
+| `NOMBA_*` | live payments | Optional - uses mock checkout when absent. |
 
 ### No WhatsApp account? Use the built-in simulator.
 
 Open the **Simulator** button on the dashboard (or `/#/whatsapp`) for a pixel-faithful
-WhatsApp UI wired to the *same* `/api/chat` backend — the real agent, real Nomba links, and
+WhatsApp UI wired to the *same* `/api/chat` backend - the real agent, real Nomba links, and
 the live dashboard all react to it. Or hit the API directly:
 
 ```bash
-# as a CUSTOMER — browse then order (any number that isn't the merchant's)
+# as a CUSTOMER - browse then order (any number that isn't the merchant's)
 curl -s localhost:4000/api/chat -H 'content-type: application/json' \
   -d '{"phone":"2348190000002","text":"What do you sell?"}'
 
@@ -183,5 +183,5 @@ curl -s localhost:4000/api/chat -H 'content-type: application/json' \
 
 <div align="center">
 <br/>
-<sub>Made with 🐝 for African traders — the people who buy and sell every day.</sub>
+<sub>Made with 🐝 for African traders - the people who buy and sell every day.</sub>
 </div>

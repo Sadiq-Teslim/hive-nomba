@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 /**
  * Reset the Hive schema and seed three varied demo stores (fashion, food,
- * electronics) with full store info and catalogues — a clean, rich demo dataset.
+ * electronics) with full store info and catalogues - a clean, rich demo dataset.
  *
  * The FIRST store's phone is the merchant; any other number that chats with Hive
  * becomes a customer of the most-recently-active onboarded store.
@@ -119,7 +119,7 @@ async function main() {
         },
       },
     });
-    console.log(`✅ ${merchant.businessName} (${s.category}) — ${s.products.length} products · merchant ${s.phone}`);
+    console.log(`✅ ${merchant.businessName} (${s.category}) - ${s.products.length} products · merchant ${s.phone}`);
   }
 
   console.log("\nMerchant phones: chat from one of these to manage that store.");

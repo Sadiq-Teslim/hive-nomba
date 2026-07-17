@@ -55,7 +55,7 @@ export function OrdersTable({ orders }: { orders: Order[] }) {
                 {pageOrders.map((o) => (
                   <tr key={o.reference} className="border-t border-ink-600/60 animate-fadeIn hover:bg-ink-600/40">
                     <td className="px-5 py-3 font-mono text-xs font-medium text-honey">{o.reference}</td>
-                    <td className="px-5 py-3 text-slate-300">{o.customer ?? "—"}</td>
+                    <td className="px-5 py-3 text-slate-300">{o.customer ?? "-"}</td>
                     <td className="px-5 py-3 text-slate-400">
                       {o.items.map((i) => `${i.quantity}× ${i.name}`).join(", ")}
                     </td>
@@ -81,7 +81,7 @@ export function OrdersTable({ orders }: { orders: Order[] }) {
                   </span>
                 </div>
                 <div className="mt-2 flex items-center justify-between gap-3">
-                  <span className="min-w-0 truncate text-sm text-slate-300">{o.customer ?? "—"}</span>
+                  <span className="min-w-0 truncate text-sm text-slate-300">{o.customer ?? "-"}</span>
                   <span className="shrink-0 font-semibold text-white">{o.total}</span>
                 </div>
                 <div className="mt-1 text-xs text-slate-500">

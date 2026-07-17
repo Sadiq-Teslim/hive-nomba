@@ -82,7 +82,7 @@ function ChatMock({ title, sub, children }: { title: string; sub: string; childr
         </div>
         <HugeiconsIcon icon={WhatsappIcon} className="ml-auto text-wa-accent" size={18} />
       </div>
-      {/* messages — min-height gives it a proper phone proportion; chat sits at the bottom */}
+      {/* messages - min-height gives it a proper phone proportion; chat sits at the bottom */}
       <div className="wa-wallpaper flex min-h-[420px] flex-col justify-end gap-1.5 px-3 py-4">{children}</div>
       {/* input bar */}
       <div className="flex items-center gap-2 bg-wa-panel px-3 py-2.5">
@@ -164,9 +164,9 @@ function Hero({ onTryDemo }: { onTryDemo: () => void }) {
           Hive does the work.
         </h1>
         <p className="mt-5 max-w-xl text-base leading-relaxed text-slate-400 sm:text-lg">
-          Hive is an AI employee for everyday traders and agents — the people who buy and sell every day. Add
+          Hive is an AI employee for everyday traders and agents - the people who buy and sell every day. Add
           products, answer customers, take orders, and collect payments with{" "}
-          <span className="font-semibold text-white">Nomba</span> — all by chatting on WhatsApp. No apps, no
+          <span className="font-semibold text-white">Nomba</span> - all by chatting on WhatsApp. No apps, no
           dashboards.
         </p>
         <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -200,7 +200,7 @@ function Hero({ onTryDemo }: { onTryDemo: () => void }) {
         <ChatMock title="Hive" sub="AI employee · online">
           <Bubble mine>add Ankara gown, ₦18,500, 12 in stock</Bubble>
           <Bubble>
-            ✅ Added Ankara Gown — ₦18,500.00, 12 in stock. Want to add a photo or another product?
+            ✅ Added Ankara Gown - ₦18,500.00, 12 in stock. Want to add a photo or another product?
           </Bubble>
           <Bubble mine>how are my sales?</Bubble>
           <Bubble>
@@ -219,7 +219,7 @@ function WhatIsHive() {
     {
       icon: AiBrain01Icon,
       title: "An employee, not an app",
-      body: "You chat in plain language — Hive actually does the work. No forms, no dashboards to learn.",
+      body: "You chat in plain language - Hive actually does the work. No forms, no dashboards to learn.",
     },
     {
       icon: SmartPhone01Icon,
@@ -229,7 +229,7 @@ function WhatIsHive() {
     {
       icon: Wallet01Icon,
       title: "Runs on Nomba",
-      body: "Real payment links, real collection, real reconciliation — money moves and confirms inside the chat.",
+      body: "Real payment links, real collection, real reconciliation - money moves and confirms inside the chat.",
     },
   ];
   return (
@@ -240,7 +240,7 @@ function WhatIsHive() {
           For everyday people who buy and sell.
         </h2>
         <p className="mt-4 text-slate-400">
-          Market traders, online vendors, resellers, POS agents — anyone running a buying-and-selling hustle.
+          Market traders, online vendors, resellers, POS agents - anyone running a buying-and-selling hustle.
           Hive turns the WhatsApp you already use into a business that runs itself.
         </p>
       </div>
@@ -263,7 +263,7 @@ function WhatIsHive() {
 
 function Vendor() {
   const commands = [
-    { icon: Camera01Icon, text: "Add a product by typing — or snap a photo and AI writes the listing" },
+    { icon: Camera01Icon, text: "Add a product by typing - or snap a photo and AI writes the listing" },
     { icon: PackageIcon, text: '"Restock Gele by 20" · "What\'s low on stock?"' },
     { icon: ChartUpIcon, text: '"How are my sales?" → revenue, top products, order counts' },
     { icon: Megaphone01Icon, text: '"Send a promo to my inactive customers"' },
@@ -274,7 +274,7 @@ function Vendor() {
       <div className="order-2 lg:order-1">
         <ChatMock title="Hive" sub="AI employee · online">
           <Bubble mine>Add Silk Scarf, 6500, 15 in stock</Bubble>
-          <Bubble>✅ Silk Scarf added — ₦6,500.00, 15 in stock.</Bubble>
+          <Bubble>✅ Silk Scarf added - ₦6,500.00, 15 in stock.</Bubble>
           <Bubble mine>what's low on stock?</Bubble>
           <Bubble>⚠️ Men's Kaftan is down to 3 left. Want me to restock it?</Bubble>
         </ChatMock>
@@ -285,7 +285,7 @@ function Vendor() {
         </Eyebrow>
         <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Your store, run by text.</h2>
         <p className="mt-4 text-slate-400">
-          Whether you sell from a shop, your DMs, or the market — onboarding, inventory, orders, analytics, and
+          Whether you sell from a shop, your DMs, or the market - onboarding, inventory, orders, analytics, and
           marketing are all just a message away.
         </p>
         <ul className="mt-6 space-y-3">
@@ -314,7 +314,7 @@ function Buyer() {
         </Eyebrow>
         <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Shop without leaving WhatsApp.</h2>
         <p className="mt-4 text-slate-400">
-          Customers discover products, order in natural language, and pay with a tap — then get an instant
+          Customers discover products, order in natural language, and pay with a tap - then get an instant
           confirmation and receipt. No links to strange sites, no app installs.
         </p>
         <div className="mt-6 space-y-3">
@@ -335,7 +335,7 @@ function Buyer() {
         <ChatMock title="Bella's Fashion Hub" sub="Business account · online">
           <Bubble mine>I want 2 Ankara Gowns</Bubble>
           <Bubble>
-            Your order HIVE-9FS52Y is ready! Total ₦37,000.00. Tap below to pay — it's confirmed automatically once
+            Your order HIVE-9FS52Y is ready! Total ₦37,000.00. Tap below to pay - it's confirmed automatically once
             you do.
             <div className="-mx-2.5 mt-2 flex items-center justify-center gap-2 border-t border-white/10 pt-2 text-[13px] font-semibold text-wa-tick">
               <HugeiconsIcon icon={LinkSquare02Icon} size={16} /> Pay Now
@@ -354,7 +354,7 @@ function Nomba() {
   const today = [
     { icon: CreditCardIcon, title: "Payment Links / Checkout", body: "Every order becomes a secure Nomba checkout, surfaced as a tap-to-pay button in chat." },
     { icon: Wallet01Icon, title: "Payment Collection", body: "Funds collected and settled to the merchant's Nomba account." },
-    { icon: ArrowReloadHorizontalIcon, title: "Webhooks + active verification", body: "We confirm via webhook AND query Nomba directly — a sale reconciles even if a webhook is missed." },
+    { icon: ArrowReloadHorizontalIcon, title: "Webhooks + active verification", body: "We confirm via webhook AND query Nomba directly - a sale reconciles even if a webhook is missed." },
   ];
   const next = [
     { icon: Layers01Icon, title: "Virtual Accounts" },
@@ -374,7 +374,7 @@ function Nomba() {
             Nomba is the financial engine.
           </h2>
           <p className="mt-4 text-slate-400">
-            Without Nomba, Hive is a chatbot. With Nomba, it's a business that runs itself — money moves, confirms,
+            Without Nomba, Hive is a chatbot. With Nomba, it's a business that runs itself - money moves, confirms,
             and reconciles inside the conversation.
           </p>
         </div>
@@ -421,7 +421,7 @@ function Loop() {
     <Section className="py-20">
       <div className="mx-auto mb-10 max-w-2xl text-center">
         <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">The whole loop, end to end.</h2>
-        <p className="mt-3 text-slate-400">One message in, a reconciled sale out — no human glue in between.</p>
+        <p className="mt-3 text-slate-400">One message in, a reconciled sale out - no human glue in between.</p>
       </div>
       <div className="flex flex-col items-stretch gap-3 md:flex-row md:items-center md:justify-between">
         {steps.map((s, i) => (
@@ -451,9 +451,9 @@ function DemoBanner({ onTryDemo }: { onTryDemo: () => void }) {
     <Section className="py-10">
       <div className="relative overflow-hidden rounded-3xl border border-wa-accent/30 bg-ink-700 p-8 text-center sm:p-12">
         <HugeiconsIcon icon={WhatsappIcon} size={40} className="mx-auto text-wa-accent" />
-        <h2 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">Don't read about it — try it.</h2>
+        <h2 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">Don't read about it - try it.</h2>
         <p className="mx-auto mt-3 max-w-xl text-slate-300">
-          Chat with Hive right in your browser — as a vendor running the store, or a buyer placing an order and
+          Chat with Hive right in your browser - as a vendor running the store, or a buyer placing an order and
           paying. No signup, no phone needed.
         </p>
         <button
@@ -486,7 +486,7 @@ function DashboardPeek({ onOpenDashboard }: { onOpenDashboard: () => void }) {
           WhatsApp runs it. The dashboard proves it.
         </h2>
         <p className="mt-4 text-slate-400">
-          A live console for the numbers a chat can't show at a glance — revenue, orders, and top products,
+          A live console for the numbers a chat can't show at a glance - revenue, orders, and top products,
           updating in real time as customers pay.
         </p>
         <button

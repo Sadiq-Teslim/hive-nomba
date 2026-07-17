@@ -16,7 +16,7 @@ export default {
           soft: "#f5c51822",
         },
         mint: "#39d98a",
-        // WhatsApp (dark theme) — matched to the real app
+        // WhatsApp (dark theme) - matched to the real app
         wa: {
           bg: "#0b141a", // conversation background
           panel: "#111b21", // app / chat-list background

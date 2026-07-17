@@ -3,7 +3,7 @@ import { z } from "zod";
 import { handleInbound } from "../services/inbound.service.js";
 
 /**
- * Local simulator for the WhatsApp experience — chat with Hive over HTTP without
+ * Local simulator for the WhatsApp experience - chat with Hive over HTTP without
  * a Meta app. POST { phone, text } and get the assistant's reply back.
  * This is the fastest way to demo and test the agent end-to-end.
  */

@@ -18,7 +18,7 @@ export interface CreateOrderInput {
 /**
  * Create a DRAFT order from human-described lines. Resolves each line to a real
  * product, snapshots name + price, and computes the total. Stock is NOT decremented
- * here — that happens only once payment is confirmed (see markOrderPaid).
+ * here - that happens only once payment is confirmed (see markOrderPaid).
  */
 export async function createOrder(input: CreateOrderInput) {
   const resolved = [];
@@ -68,7 +68,7 @@ export async function getOrderByReference(reference: string) {
 
 /**
  * Mark an order paid: flip statuses, decrement stock for each line, and stamp
- * the customer's lastOrderedAt. Idempotent — safe to call from a webhook retry.
+ * the customer's lastOrderedAt. Idempotent - safe to call from a webhook retry.
  */
 export async function markOrderPaid(orderId: string, providerRef?: string, rawWebhook?: unknown) {
   return prisma.$transaction(async (tx) => {

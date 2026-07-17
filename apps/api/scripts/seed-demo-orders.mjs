@@ -22,7 +22,7 @@ const CUSTOMERS = [
 
 async function main() {
   const store = await prisma.merchant.findFirst({ where: { onboarded: true }, orderBy: { createdAt: "asc" }, include: { products: true } });
-  if (!store) throw new Error("No store found — run the seed first.");
+  if (!store) throw new Error("No store found - run the seed first.");
 
   // Clear existing demo orders/customers for a clean slate on this store.
   await prisma.order.deleteMany({ where: { merchantId: store.id } });

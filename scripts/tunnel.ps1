@@ -1,6 +1,6 @@
 # Keep the Outray tunnel alive. If it drops, this restarts it automatically.
 # The fixed subdomain means the public URL is ALWAYS https://hive-ace.outray.app
-# so the webhook URL you give Nomba never changes — even after a restart.
+# so the webhook URL you give Nomba never changes - even after a restart.
 #
 # Usage (from repo root):  pwsh ./scripts/tunnel.ps1   (or)  powershell ./scripts/tunnel.ps1
 

@@ -3,7 +3,7 @@ import type { Persona } from "./types";
 /**
  * Simulator identities. Three merchants (one per seeded store) chat with their AI
  * employee "Hive"; a shopper reaches Hive and must pick which store to buy from
- * (there's no default — each customer chooses their store).
+ * (there's no default - each customer chooses their store).
  */
 export const PERSONAS: Persona[] = [
   {
@@ -53,4 +53,4 @@ const OWNERS: Record<string, string> = {
 export const greetingFor = (p: Persona): string =>
   p.id === "customer"
     ? "👋 Welcome to Hive! Which store would you like to shop from today?"
-    : `👋 Hi ${OWNERS[p.id] ?? "there"}! I'm Hive, your AI employee. Ask me to add products, check sales, update stock, handle refunds — anything to run your business.`;
+    : `👋 Hi ${OWNERS[p.id] ?? "there"}! I'm Hive, your AI employee. Ask me to add products, check sales, update stock, handle refunds - anything to run your business.`;

@@ -3,7 +3,7 @@
  * can send native tappable buttons (Twilio's basic Messages API only sends text).
  *
  * Each template's body is a single variable {{1}} = the full message text, and the
- * buttons are fixed — so any dynamic message reuses the same template.
+ * buttons are fixed - so any dynamic message reuses the same template.
  *
  * Usage (from repo root):
  *   node --env-file=apps/api/.env apps/api/scripts/setup-twilio-content.mjs

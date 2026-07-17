@@ -5,12 +5,12 @@ import { formatNaira } from "../utils/money.js";
 import { logger } from "../config/logger.js";
 
 /**
- * Post-payment landing page — where Nomba redirects the customer's browser after
+ * Post-payment landing page - where Nomba redirects the customer's browser after
  * checkout (the `callbackUrl`, with ?orderReference=<ours>&orderId=<nomba>).
  *
  * We don't trust the redirect alone: we actively verify the payment with Nomba
  * here and reconcile (mark paid + notify) if it really went through. The page
- * then shows the HONEST state — confirmed, or "not received yet".
+ * then shows the HONEST state - confirmed, or "not received yet".
  */
 export const payRouter = Router();
 
@@ -37,8 +37,8 @@ payRouter.get("/pay/complete", async (req, res) => {
   const iconColor = confirmed ? "#39d98a" : "#f5c518";
   const heading = confirmed ? "Payment confirmed" : "Payment not received yet";
   const tag = confirmed
-    ? "🐝 Return to WhatsApp — Hive has confirmed your order."
-    : "If you just paid, give it a moment and tell Hive on WhatsApp — it will re-check.";
+    ? "🐝 Return to WhatsApp - Hive has confirmed your order."
+    : "If you just paid, give it a moment and tell Hive on WhatsApp - it will re-check.";
 
   res.type("html").send(`<!doctype html>
 <html><head><meta name="viewport" content="width=device-width, initial-scale=1"/>

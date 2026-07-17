@@ -75,7 +75,7 @@ export async function lowStockProducts(merchantId: string, threshold = 5) {
   });
 }
 
-/** Remove a product from the catalogue (soft delete — keeps it on past orders). */
+/** Remove a product from the catalogue (soft delete - keeps it on past orders). */
 export async function deactivateProduct(productId: string) {
   return prisma.product.update({ where: { id: productId }, data: { active: false } });
 }

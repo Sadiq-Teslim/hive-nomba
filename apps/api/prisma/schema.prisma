@@ -1,4 +1,4 @@
-// Hive — data model
+// Hive - data model
 // The single source of truth for merchants, products, customers, orders and payments.
 // Everything flows from a WhatsApp conversation; the AI agent reads/writes these tables.
 
