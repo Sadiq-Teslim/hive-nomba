@@ -1,5 +1,5 @@
 import { HugeiconsIcon } from "@hugeicons/react";
-import { DashboardSquare01Icon, MoreVerticalIcon, Search01Icon, Camera01Icon } from "@hugeicons/core-free-icons";
+import { DashboardSquare01Icon, Search01Icon } from "@hugeicons/core-free-icons";
 import type { ChatMessage, Persona } from "./types";
 
 const time = (ts: number) =>
@@ -24,12 +24,10 @@ export function ChatList({ personas, threads, selectedPhone, onSelect, onOpenDas
             Simulator
           </span>
         </div>
-        <div className="flex items-center gap-5 text-wa-sub">
-          <HugeiconsIcon icon={Camera01Icon} size={20} />
+        <div className="flex items-center text-wa-sub">
           <button onClick={onOpenDashboard} title="Open dashboard" className="hover:text-wa-text">
             <HugeiconsIcon icon={DashboardSquare01Icon} size={20} />
           </button>
-          <HugeiconsIcon icon={MoreVerticalIcon} size={20} />
         </div>
       </header>
 

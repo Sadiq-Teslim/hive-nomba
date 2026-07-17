@@ -5,7 +5,7 @@ import { API_ORIGIN } from "../../api";
 
 type Threads = Record<string, ChatMessage[]>;
 
-const STORAGE_KEY = "hive_wa_threads_v1";
+const STORAGE_KEY = "hive_wa_threads_v2";
 const uid = () => Math.random().toString(36).slice(2, 10);
 
 function loadThreads(): Threads {
@@ -88,20 +88,22 @@ export function useChats() {
         };
 
         patchMessage(persona.phone, myMsg.id, { status: "read" });
-        append(persona.phone, {
-          id: uid(),
-          from: "hive",
-          text: data.reply,
-          ts: Date.now(),
-          cta: data.cta,
-          buttons: data.buttons,
-        });
+        if (data.reply.trim()) {
+          append(persona.phone, {
+            id: uid(),
+            from: "hive",
+            text: data.reply,
+            ts: Date.now(),
+            cta: data.cta,
+            buttons: data.buttons,
+          });
+        }
       } catch (e) {
         patchMessage(persona.phone, myMsg.id, { status: "sent" });
         append(persona.phone, {
           id: uid(),
           from: "hive",
-          text: "⚠️ Couldn't reach Hive. Make sure the API is running on :4000, then try again.",
+          text: "⚠️ Couldn't reach Hive. Please try again in a moment.",
           ts: Date.now(),
         });
       } finally {

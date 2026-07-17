@@ -55,8 +55,7 @@ function EmptyState() {
       </div>
       <h2 className="text-2xl font-light text-wa-text">Hive WhatsApp Simulator</h2>
       <p className="max-w-sm text-sm text-wa-sub">
-        Pick a chat to test Hive. Message as <b className="text-wa-text">Bella</b> to run the business, or as a{" "}
-        <b className="text-wa-text">customer</b> to shop and pay — all through real WhatsApp-style conversations.
+        Open Orthodox Gadgets to run the seller demo through the same Hive conversation flow used on WhatsApp.
       </p>
     </div>
   );

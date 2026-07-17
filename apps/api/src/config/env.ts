@@ -8,7 +8,7 @@ const schema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: z.coerce.number().default(4000),
   PUBLIC_BASE_URL: z.string().url().default("http://localhost:4000"),
-  APP_WEB_URL: z.string().url().default("http://localhost:5173"),
+  APP_WEB_URL: z.union([z.string().url(), z.literal("")]).default(""),
 
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
   ACTIVATION_CODE_SECRET: z.string().default(""),
@@ -86,6 +86,9 @@ const activationSecretSource =
 
 export const env = {
   ...parsed.data,
+  APP_WEB_URL:
+    parsed.data.APP_WEB_URL ||
+    (parsed.data.NODE_ENV === "production" ? "https://hive-nomba-web.vercel.app" : "http://localhost:5173"),
   ACTIVATION_CODE_SECRET:
     parsed.data.ACTIVATION_CODE_SECRET ||
     crypto.createHash("sha256").update(`hive:activation:${activationSecretSource}`).digest("hex"),
