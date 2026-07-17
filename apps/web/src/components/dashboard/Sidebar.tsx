@@ -7,10 +7,14 @@ import {
   Analytics01Icon,
   WhatsappIcon,
   Globe02Icon,
+  Store01Icon,
+  Alert02Icon,
 } from "@hugeicons/core-free-icons";
 
 const NAV = [
   { label: "Overview", icon: DashboardSquare01Icon, target: "dashboard" },
+  { label: "Business setup", icon: Store01Icon, target: "setup" },
+  { label: "Operations", icon: Alert02Icon, target: "operations" },
   { label: "Analytics", icon: Analytics01Icon, target: "analytics" },
   { label: "Orders", icon: ShoppingCart01Icon, target: "orders" },
   { label: "Products", icon: PackageIcon, target: "inventory" },
@@ -63,7 +67,7 @@ export function Sidebar({
           className="flex w-full items-center gap-3 rounded-xl bg-wa-accent/10 px-3 py-2.5 text-sm font-medium text-wa-accent transition-colors hover:bg-wa-accent/15"
         >
           <HugeiconsIcon icon={WhatsappIcon} size={18} strokeWidth={2} />
-          WhatsApp Simulator
+          Hive WhatsApp Simulator
         </button>
         <button
           onClick={onBackToSite}

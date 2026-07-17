@@ -4,6 +4,7 @@ import { normalizePhone } from "../utils/ref.js";
 import { getOrCreateCustomer } from "./customer.service.js";
 import { getConversationStore } from "./conversation.service.js";
 import type { ToolContext } from "../agent/tools.js";
+import { isProd } from "../config/env.js";
 
 export type RouteMode = "merchant" | "shopping" | "lobby";
 
@@ -32,7 +33,7 @@ export async function routeInbound(rawPhone: string): Promise<RouteResult> {
   }
 
   const merchantCount = await prisma.merchant.count();
-  if (merchantCount === 0) {
+  if (merchantCount === 0 && !isProd) {
     const created = await prisma.merchant.create({ data: { whatsappPhone: phone } });
     return { party: "MERCHANT", mode: "merchant", ctx: { party: "MERCHANT", merchantId: created.id } };
   }

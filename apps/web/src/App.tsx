@@ -18,6 +18,8 @@ import { Topbar } from "./components/dashboard/Topbar";
 import { KpiCard } from "./components/dashboard/KpiCard";
 import { RevenueChart, StatusDonut } from "./components/dashboard/charts";
 import { dailyRevenue, dailyOrderCounts, statusCounts, topCustomers } from "./components/dashboard/derive";
+import { BusinessSetup } from "./components/BusinessSetup";
+import { OperationsPanel } from "./components/OperationsPanel";
 
 export default function App({ onOpenSimulator }: { onOpenSimulator: () => void }) {
   const [merchants, setMerchants] = useState<Merchant[]>([]);
@@ -29,12 +31,13 @@ export default function App({ onOpenSimulator }: { onOpenSimulator: () => void }
       .merchants()
       .then((list) => {
         setMerchants(list);
-        setSelectedId((cur) => cur ?? list[0]?.id ?? null);
+        const sessionMerchantId = window.localStorage.getItem("hive_merchant_id");
+        setSelectedId((cur) => cur ?? list.find((m) => m.id === sessionMerchantId)?.id ?? list[0]?.id ?? null);
       })
       .catch((e) => setBootError(e instanceof Error ? e.message : "Cannot reach the Hive API"));
   }, []);
 
-  const { overview, products, orders, loading, error, lastUpdated, refresh } = useDashboard(selectedId);
+  const { overview, setup, products, orders, riskEvents, disputes, handovers, loading, error, lastUpdated, refresh } = useDashboard(selectedId);
   const a = overview?.analytics;
 
   const series = dailyRevenue(orders, 14);
@@ -106,6 +109,10 @@ export default function App({ onOpenSimulator }: { onOpenSimulator: () => void }
               loading={loading && !a}
             />
           </section>
+
+          <BusinessSetup merchantId={selectedId} setup={setup} onRefresh={refresh} />
+
+          <OperationsPanel merchantId={selectedId} riskEvents={riskEvents} disputes={disputes} handovers={handovers} onRefresh={refresh} />
 
           {/* Revenue chart + order status */}
           <section id="analytics" className="grid grid-cols-1 gap-5 lg:grid-cols-3">

@@ -8,17 +8,18 @@ export async function getOrCreateConversation(
   link: { merchantId?: string; customerId?: string },
 ) {
   const normalized = normalizePhone(phone);
+  const scopeKey = link.merchantId ?? "LOBBY";
   return prisma.conversation.upsert({
-    where: { phone_party: { phone: normalized, party } },
+    where: { scopeKey_phone_party: { scopeKey, phone: normalized, party } },
     update: { merchantId: link.merchantId, customerId: link.customerId },
-    create: { phone: normalized, party, merchantId: link.merchantId, customerId: link.customerId },
+    create: { scopeKey, phone: normalized, party, merchantId: link.merchantId, customerId: link.customerId },
   });
 }
 
 /** The store a customer has chosen for this conversation, if any. */
 export async function getConversationStore(phone: string): Promise<string | null> {
   const convo = await prisma.conversation.findUnique({
-    where: { phone_party: { phone: normalizePhone(phone), party: "CUSTOMER" } },
+    where: { scopeKey_phone_party: { scopeKey: "LOBBY", phone: normalizePhone(phone), party: "CUSTOMER" } },
   });
   return convo?.merchantId ?? null;
 }
@@ -26,9 +27,9 @@ export async function getConversationStore(phone: string): Promise<string | null
 /** Lock a customer's conversation to a chosen store. */
 export async function setConversationStore(phone: string, merchantId: string) {
   return prisma.conversation.upsert({
-    where: { phone_party: { phone: normalizePhone(phone), party: "CUSTOMER" } },
+    where: { scopeKey_phone_party: { scopeKey: "LOBBY", phone: normalizePhone(phone), party: "CUSTOMER" } },
     update: { merchantId },
-    create: { phone: normalizePhone(phone), party: "CUSTOMER", merchantId },
+    create: { scopeKey: "LOBBY", phone: normalizePhone(phone), party: "CUSTOMER", merchantId },
   });
 }
 

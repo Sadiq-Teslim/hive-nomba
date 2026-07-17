@@ -1,7 +1,9 @@
-import type { OrderStatus } from "@prisma/client";
+import { Prisma, type OrderStatus } from "@prisma/client";
 import { prisma } from "../config/db.js";
 import { orderReference } from "../utils/ref.js";
 import { findProductByName } from "./product.service.js";
+import { sendWhatsAppText } from "../integrations/whatsapp/whatsapp.client.js";
+import { logger } from "../config/logger.js";
 
 export interface OrderLineInput {
   /** Product name (will be fuzzy-matched) OR a concrete productId. */
@@ -70,17 +72,29 @@ export async function getOrderByReference(reference: string) {
  * Mark an order paid: flip statuses, decrement stock for each line, and stamp
  * the customer's lastOrderedAt. Idempotent — safe to call from a webhook retry.
  */
-export async function markOrderPaid(orderId: string, providerRef?: string, rawWebhook?: unknown) {
+export async function markOrderPaid(orderId: string, providerRef?: string, rawWebhook?: unknown, txnId?: string) {
   return prisma.$transaction(async (tx) => {
     const order = await tx.order.findUnique({
       where: { id: orderId },
       include: { items: true, payment: true },
     });
     if (!order) throw new Error("Order not found");
-    if (order.status === "PAID" || order.status === "FULFILLED") return order; // idempotent
+    if (order.payment?.paidAt || order.payment?.status === "SUCCESS" || order.payment?.status === "REFUNDED") return order;
 
     for (const item of order.items) {
       if (item.productId) {
+        const product = await tx.product.findUnique({ where: { id: item.productId } });
+        if (product && product.stock < item.quantity) {
+          await tx.riskEvent.create({
+            data: {
+              merchantId: order.merchantId,
+              eventType: "paid_order_stock_shortfall",
+              severity: "HIGH",
+              reason: `${item.nameSnapshot} stock was below the paid quantity for this order.`,
+              metadata: { orderId: order.id, productId: item.productId, available: product.stock, required: item.quantity },
+            },
+          });
+        }
         await tx.product.update({
           where: { id: item.productId },
           data: { stock: { decrement: item.quantity } },
@@ -95,14 +109,28 @@ export async function markOrderPaid(orderId: string, providerRef?: string, rawWe
       });
     }
 
-    await tx.payment.update({
+    const payment = await tx.payment.update({
       where: { orderId },
       data: {
         status: "SUCCESS",
         paidAt: new Date(),
         providerRef: providerRef ?? order.payment?.providerRef,
+        txnId: txnId ?? order.payment?.txnId,
         rawWebhook: rawWebhook ? (rawWebhook as object) : undefined,
       },
+    });
+
+    await tx.paymentEvent.create({
+      data: {
+        paymentId: payment.id,
+        eventType: "payment_confirmed",
+        providerRef: providerRef ?? payment.providerRef,
+        txnId: txnId ?? payment.txnId,
+        raw: rawWebhook ? (rawWebhook as Prisma.InputJsonValue) : undefined,
+      },
+    });
+    await tx.orderStatusEvent.create({
+      data: { orderId, fromStatus: order.status, toStatus: "PAID", actorType: "payment_provider" },
     });
 
     return tx.order.update({
@@ -140,11 +168,72 @@ export async function fulfillOrder(reference: string, merchantId: string) {
   if (order.status === "FULFILLED") return { ok: true as const, order };
   if (order.status !== "PAID")
     return { ok: false as const, error: `Order ${order.reference} isn't paid yet (status: ${order.status}).` };
-  const updated = await prisma.order.update({
-    where: { id: order.id },
-    data: { status: "FULFILLED" },
-    include: { items: true },
+  const updated = await prisma.$transaction(async (tx) => {
+    const next = await tx.order.update({
+      where: { id: order.id },
+      data: { status: "FULFILLED", deliveredAt: new Date() },
+      include: { items: true, customer: true },
+    });
+    await tx.orderStatusEvent.create({ data: { orderId: order.id, fromStatus: order.status, toStatus: "FULFILLED", actorType: "merchant", actorId: merchantId } });
+    return next;
   });
+  if (updated.customer?.whatsappPhone) {
+    await sendWhatsAppText(updated.customer.whatsappPhone, `Order ${updated.reference} has been fulfilled.`)
+      .catch((error) => logger.warn({ error, orderId: updated.id }, "order status customer notify failed"));
+  }
+  return { ok: true as const, order: updated };
+}
+
+const ORDER_TRANSITIONS: Partial<Record<OrderStatus, OrderStatus[]>> = {
+  PAID: ["ACCEPTED", "PROCESSING"],
+  ACCEPTED: ["PROCESSING"],
+  PROCESSING: ["READY_FOR_PICKUP", "DISPATCHED"],
+  READY_FOR_PICKUP: ["FULFILLED"],
+  DISPATCHED: ["DELIVERED"],
+  DELIVERED: ["FULFILLED"],
+};
+
+export async function updateOrderStatus(input: {
+  reference: string;
+  merchantId: string;
+  status: OrderStatus;
+  note?: string;
+  carrier?: string;
+  trackingRef?: string;
+}) {
+  const order = await getOrderByReference(input.reference);
+  if (!order || order.merchantId !== input.merchantId) return { ok: false as const, error: "Order not found." };
+  if (order.status === input.status) return { ok: true as const, order };
+  if (!(ORDER_TRANSITIONS[order.status] ?? []).includes(input.status)) {
+    return { ok: false as const, error: `Order ${order.reference} cannot move from ${order.status} to ${input.status}.` };
+  }
+
+  const now = new Date();
+  const updated = await prisma.$transaction(async (tx) => {
+    const next = await tx.order.update({
+      where: { id: order.id },
+      data: {
+        status: input.status,
+        fulfilmentNote: input.note,
+        dispatchCarrier: input.carrier,
+        dispatchTrackingRef: input.trackingRef,
+        acceptedAt: input.status === "ACCEPTED" ? now : undefined,
+        dispatchedAt: input.status === "DISPATCHED" ? now : undefined,
+        deliveredAt: input.status === "DELIVERED" || input.status === "FULFILLED" ? now : undefined,
+      },
+      include: { items: true, customer: true, payment: true },
+    });
+    await tx.orderStatusEvent.create({
+      data: { orderId: order.id, fromStatus: order.status, toStatus: input.status, actorType: "merchant", actorId: input.merchantId, note: input.note },
+    });
+    return next;
+  });
+  if (updated.customer?.whatsappPhone) {
+    const readable = input.status.toLowerCase().replaceAll("_", " ");
+    const tracking = input.trackingRef ? ` Tracking: ${input.trackingRef}.` : "";
+    await sendWhatsAppText(updated.customer.whatsappPhone, `Order ${updated.reference} is now ${readable}.${tracking}`)
+      .catch((error) => logger.warn({ error, orderId: updated.id }, "order status customer notify failed"));
+  }
   return { ok: true as const, order: updated };
 }
 
@@ -174,20 +263,24 @@ export async function cancelOrder(opts: { reference?: string; customerId?: strin
   if (opts.merchantId && order.merchantId !== opts.merchantId) {
     return { ok: false as const, error: "That order belongs to a different store." };
   }
-  if (order.status === "PAID" || order.status === "FULFILLED") {
-    return { ok: false as const, error: `Order ${order.reference} is already paid and can't be cancelled.` };
+  if (order.status !== "DRAFT" && order.status !== "PENDING_PAYMENT" && order.status !== "CANCELLED") {
+    return { ok: false as const, error: `Order ${order.reference} is already paid and can't be cancelled. Use the refund workflow instead.` };
   }
   if (order.status === "CANCELLED") {
     return { ok: true as const, order };
   }
 
-  const updated = await prisma.order.update({
-    where: { id: order.id },
-    data: {
-      status: "CANCELLED",
-      payment: order.payment ? { update: { status: "FAILED" } } : undefined,
-    },
-    include: { items: true },
+  const updated = await prisma.$transaction(async (tx) => {
+    const next = await tx.order.update({
+      where: { id: order.id },
+      data: {
+        status: "CANCELLED",
+        payment: order.payment ? { update: { status: "FAILED" } } : undefined,
+      },
+      include: { items: true },
+    });
+    await tx.orderStatusEvent.create({ data: { orderId: order.id, fromStatus: order.status, toStatus: "CANCELLED", actorType: opts.merchantId ? "merchant" : "customer", actorId: opts.merchantId ?? opts.customerId } });
+    return next;
   });
   return { ok: true as const, order: updated };
 }

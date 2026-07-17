@@ -40,26 +40,32 @@ export async function createPaymentLinkForOrder(orderId: string) {
     callbackUrl: `${env.PUBLIC_BASE_URL}/pay/complete`,
   });
 
-  const payment = await prisma.payment.upsert({
-    where: { orderId },
-    update: {
-      method: "LINK",
-      amountKobo: order.totalKobo,
-      checkoutUrl: checkout.checkoutUrl,
-      providerRef: checkout.providerRef,
-      status: "PENDING",
-    },
-    create: {
-      orderId,
-      method: "LINK",
-      amountKobo: order.totalKobo,
-      checkoutUrl: checkout.checkoutUrl,
-      providerRef: checkout.providerRef,
-      status: "PENDING",
-    },
+  const payment = await prisma.$transaction(async (tx) => {
+    const next = await tx.payment.upsert({
+      where: { orderId },
+      update: {
+        method: "LINK",
+        amountKobo: order.totalKobo,
+        checkoutUrl: checkout.checkoutUrl,
+        providerRef: checkout.providerRef,
+        status: "PENDING",
+      },
+      create: {
+        orderId,
+        method: "LINK",
+        amountKobo: order.totalKobo,
+        checkoutUrl: checkout.checkoutUrl,
+        providerRef: checkout.providerRef,
+        status: "PENDING",
+      },
+    });
+    await tx.paymentEvent.create({ data: { paymentId: next.id, eventType: "checkout_created", providerRef: checkout.providerRef } });
+    await tx.order.update({ where: { id: orderId }, data: { status: "PENDING_PAYMENT" } });
+    if (order.status !== "PENDING_PAYMENT") {
+      await tx.orderStatusEvent.create({ data: { orderId, fromStatus: order.status, toStatus: "PENDING_PAYMENT", actorType: "system" } });
+    }
+    return next;
   });
-
-  await prisma.order.update({ where: { id: orderId }, data: { status: "PENDING_PAYMENT" } });
 
   return { payment, checkoutUrl: checkout.checkoutUrl, mocked: checkout.mocked, order };
 }
@@ -76,28 +82,34 @@ export async function createVirtualAccountForOrder(orderId: string) {
   const holderName = order.customer?.name ?? order.merchant?.businessName ?? "Hive Customer";
   const va = await createVirtualAccount(order.reference, holderName);
 
-  const payment = await prisma.payment.upsert({
-    where: { orderId },
-    update: {
-      method: "VIRTUAL_ACCOUNT",
-      amountKobo: order.totalKobo,
-      vaNumber: va.accountNumber,
-      vaBank: va.bankName,
-      vaName: va.accountName,
-      status: "PENDING",
-    },
-    create: {
-      orderId,
-      method: "VIRTUAL_ACCOUNT",
-      amountKobo: order.totalKobo,
-      vaNumber: va.accountNumber,
-      vaBank: va.bankName,
-      vaName: va.accountName,
-      status: "PENDING",
-    },
+  const payment = await prisma.$transaction(async (tx) => {
+    const next = await tx.payment.upsert({
+      where: { orderId },
+      update: {
+        method: "VIRTUAL_ACCOUNT",
+        amountKobo: order.totalKobo,
+        vaNumber: va.accountNumber,
+        vaBank: va.bankName,
+        vaName: va.accountName,
+        status: "PENDING",
+      },
+      create: {
+        orderId,
+        method: "VIRTUAL_ACCOUNT",
+        amountKobo: order.totalKobo,
+        vaNumber: va.accountNumber,
+        vaBank: va.bankName,
+        vaName: va.accountName,
+        status: "PENDING",
+      },
+    });
+    await tx.paymentEvent.create({ data: { paymentId: next.id, eventType: "virtual_account_created" } });
+    await tx.order.update({ where: { id: orderId }, data: { status: "PENDING_PAYMENT" } });
+    if (order.status !== "PENDING_PAYMENT") {
+      await tx.orderStatusEvent.create({ data: { orderId, fromStatus: order.status, toStatus: "PENDING_PAYMENT", actorType: "system" } });
+    }
+    return next;
   });
-
-  await prisma.order.update({ where: { id: orderId }, data: { status: "PENDING_PAYMENT" } });
   return { payment, va, order };
 }
 
@@ -114,7 +126,7 @@ export async function refundOrder(opts: { reference: string; merchantId?: string
   if (opts.customerId && order.customerId && order.customerId !== opts.customerId)
     return { ok: false as const, error: "That order isn't yours." };
   if (order.status === "REFUNDED") return { ok: true as const, order, message: "Already refunded." };
-  if (order.status !== "PAID" && order.status !== "FULFILLED")
+  if (!["PAID", "ACCEPTED", "PROCESSING", "READY_FOR_PICKUP", "DISPATCHED", "DELIVERED", "FULFILLED", "REFUND_REQUESTED"].includes(order.status))
     return { ok: false as const, error: `Order ${order.reference} isn't paid, so there's nothing to refund.` };
 
   const txnId = order.payment?.txnId ?? (await getTransactionId(order.reference));
@@ -129,6 +141,14 @@ export async function refundOrder(opts: { reference: string; merchantId?: string
       if (item.productId) await tx.product.update({ where: { id: item.productId }, data: { stock: { increment: item.quantity } } });
     }
     await tx.payment.updateMany({ where: { orderId: order.id }, data: { status: "REFUNDED", refundedAt: new Date() } });
+    if (order.payment) {
+      await tx.paymentEvent.create({ data: { paymentId: order.payment.id, eventType: "refund_confirmed", txnId } });
+    }
+    await tx.orderStatusEvent.create({ data: { orderId: order.id, fromStatus: order.status, toStatus: "REFUNDED", actorType: "system", note: opts.reason } });
+    await tx.dispute.updateMany({
+      where: { orderId: order.id, status: { not: "CLOSED" } },
+      data: { status: "RESOLVED_FOR_BUYER", resolution: opts.reason ?? "Refund approved and submitted." },
+    });
     return tx.order.update({
       where: { id: order.id },
       data: { status: "REFUNDED" },
@@ -210,14 +230,14 @@ export async function verifyPayment(opts: { reference?: string; orderId?: string
       : null;
 
   if (!order) return { found: false, paid: false, alreadyPaid: false, order: null };
-  if (order.status === "PAID" || order.status === "FULFILLED") {
+  if (order.payment?.paidAt || order.payment?.status === "SUCCESS" || order.payment?.status === "REFUNDED") {
     return { found: true, paid: true, alreadyPaid: true, order };
   }
 
   // Verify with Nomba using OUR order reference (what Nomba echoes as orderReference).
   const status = await getCheckoutStatus(order.reference);
   if (status.paid) {
-    await markOrderPaid(order.id, order.payment?.providerRef ?? undefined, status.raw);
+    await markOrderPaid(order.id, order.payment?.providerRef ?? undefined, status.raw, status.txnId);
     await notifyOrderPaid(order.id);
     return { found: true, paid: true, alreadyPaid: false, order: await getOrder(order.id) };
   }

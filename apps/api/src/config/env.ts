@@ -7,8 +7,14 @@ const schema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: z.coerce.number().default(4000),
   PUBLIC_BASE_URL: z.string().url().default("http://localhost:4000"),
+  APP_WEB_URL: z.string().url().default("http://localhost:5173"),
 
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
+  ACTIVATION_CODE_SECRET: z.string().default("hive-local-activation-secret"),
+  ACTIVATION_CODE_TTL_MINUTES: z.coerce.number().default(15),
+  ACTIVATION_CODE_RATE_LIMIT: z.coerce.number().default(5),
+  ACTIVATION_ATTEMPT_RATE_LIMIT: z.coerce.number().default(10),
+  SESSION_TTL_DAYS: z.coerce.number().default(30),
 
   GROQ_API_KEY: z.string().default(""),
   GROQ_MODEL: z.string().default("llama-3.3-70b-versatile"),
@@ -38,6 +44,7 @@ const schema = z.object({
   // scripts/setup-twilio-content.mjs). Empty = fall back to a text list.
   TWILIO_CONTENT_WELCOME_SID: z.string().default(""),
   TWILIO_CONTENT_PAYMENT_SID: z.string().default(""),
+  HIVE_WHATSAPP_NUMBER: z.string().default("14155238886"),
 
   NOMBA_BASE_URL: z.string().default("https://api.nomba.com"),
   NOMBA_CLIENT_ID: z.string().default(""),
@@ -53,6 +60,16 @@ const schema = z.object({
   // Keep-alive self-ping interval (ms) to stop the host (e.g. Render free tier)
   // from sleeping. Only runs in production against a real public URL.
   KEEPALIVE_INTERVAL_MS: z.coerce.number().default(60_000),
+}).superRefine((value, ctx) => {
+  if (value.NODE_ENV === "production" && value.ACTIVATION_CODE_SECRET === "hive-local-activation-secret") {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["ACTIVATION_CODE_SECRET"], message: "Use a strong unique activation-code secret in production." });
+  }
+  if (value.NODE_ENV === "production" && value.WHATSAPP_PROVIDER === "twilio" && !value.TWILIO_VALIDATE_SIGNATURE) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["TWILIO_VALIDATE_SIGNATURE"], message: "Twilio signature validation must be enabled in production." });
+  }
+  if (value.NODE_ENV === "production" && value.NOMBA_CLIENT_ID && value.NOMBA_PRIVATE_KEY && !value.NOMBA_WEBHOOK_SECRET) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["NOMBA_WEBHOOK_SECRET"], message: "A Nomba webhook secret is required for live payments." });
+  }
 });
 
 const parsed = schema.safeParse(process.env);

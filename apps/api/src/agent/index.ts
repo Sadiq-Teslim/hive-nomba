@@ -25,6 +25,8 @@ export interface AgentInput {
 /** Structured reply: plain text plus optional interactive elements (WhatsApp/simulator). */
 export interface AgentReply {
   text: string;
+  /** True when a human owns the conversation and the channel must not auto-reply. */
+  suppressDelivery?: boolean;
   /** A single URL call-to-action button, e.g. "Pay Now" → Nomba checkout. */
   cta?: { label: string; url: string };
   /** Up to 3 quick-reply buttons; tapping sends the label back as a message. */

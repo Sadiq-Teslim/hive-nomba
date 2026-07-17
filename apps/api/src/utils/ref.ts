@@ -6,6 +6,31 @@ export function orderReference(): string {
   return `HIVE-${s}`;
 }
 
+export function activationCode(): string {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let s = "";
+  for (let i = 0; i < 6; i++) s += alphabet[Math.floor(Math.random() * alphabet.length)];
+  return `HIVE-${s}`;
+}
+
+export function storeCode(): string {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let s = "";
+  for (let i = 0; i < 6; i++) s += alphabet[Math.floor(Math.random() * alphabet.length)];
+  return `SHOP-${s}`;
+}
+
+export function slugifyBusinessName(name: string): string {
+  const slug = name
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 48);
+  return slug || "store";
+}
+
 /** Normalize a phone number to a bare E.164-ish digit string (no +, no spaces). */
 export function normalizePhone(raw: string): string {
   return raw.replace(/[^\d]/g, "");

@@ -35,6 +35,7 @@ function renderAsText(reply: AgentReply): string {
  * (a "Pay Now" URL button, or quick-reply buttons). Twilio/mock fall back to text.
  */
 export async function sendWhatsAppReply(to: string, reply: AgentReply): Promise<void> {
+  if (reply.suppressDelivery) return;
   if (!features.whatsapp) {
     logger.info({ to, ...reply, provider: features.whatsappProvider }, "📲 [mock WhatsApp] outbound reply");
     return;

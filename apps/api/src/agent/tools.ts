@@ -35,6 +35,7 @@ import {
   listOrders,
   fulfillOrder,
   latestCancellableOrder,
+  updateOrderStatus,
 } from "../services/order.service.js";
 import {
   createPaymentLinkForOrder,
@@ -47,6 +48,7 @@ import { getAnalytics } from "../services/analytics.service.js";
 import { findInactiveCustomers, getOrCreateCustomer, listCustomers } from "../services/customer.service.js";
 import { sendPromotion } from "../services/promotion.service.js";
 import { raiseTicket, listOpenTickets } from "../services/support.service.js";
+import { requestOrderRefund } from "../services/dispute.service.js";
 
 /** Runtime context passed to every tool executor. */
 export interface ToolContext {
@@ -353,7 +355,7 @@ const tools: Tool[] = [
     declaration: {
       name: "request_refund",
       description:
-        "Refund the customer's paid order via Nomba and restore stock. Use only when the customer asks for a refund/return on a paid order. Omit the reference to use their most recent paid order.",
+        "Open a refund request for the customer's paid order for merchant review. This does not move money. Omit the reference to use their most recent eligible order.",
       parameters: {
         type: Type.OBJECT,
         properties: {
@@ -366,19 +368,22 @@ const tools: Tool[] = [
       let reference = args.reference as string | undefined;
       if (!reference && ctx.customerId) {
         const paid = await prisma.order.findFirst({
-          where: { customerId: ctx.customerId, status: { in: ["PAID", "FULFILLED"] } },
+          where: { customerId: ctx.customerId, status: { in: ["PAID", "ACCEPTED", "PROCESSING", "READY_FOR_PICKUP", "DISPATCHED", "DELIVERED", "FULFILLED"] } },
           orderBy: { updatedAt: "desc" },
         });
         reference = paid?.reference;
       }
       if (!reference) return { ok: false, error: "No paid order found to refund." };
-      const result = await refundOrder({ reference, customerId: ctx.customerId, reason: args.reason });
+      if (!ctx.customerId) return { ok: false, error: "No customer context." };
+      const result = await requestOrderRefund({ reference, customerId: ctx.customerId, reason: args.reason });
       if (!result.ok) return { ok: false, error: result.error };
       return {
         ok: true,
         reference: result.order.reference,
         status: result.order.status,
-        message: "Refund triggered and stock restored. Reassure the customer it's on the way.",
+        message: result.alreadyOpen
+          ? "This refund request is already open. Tell the customer it is still under review."
+          : "Refund request opened and the merchant was alerted. Tell the customer it is awaiting review.",
       };
     },
   },
@@ -559,6 +564,33 @@ const tools: Tool[] = [
     async execute(args, ctx) {
       const result = await fulfillOrder(args.reference, ctx.merchantId);
       if (!result.ok) return { ok: false, error: result.error };
+      return { ok: true, reference: result.order.reference, status: result.order.status };
+    },
+  },
+
+  {
+    parties: ["MERCHANT"],
+    declaration: {
+      name: "update_order_status",
+      description: "Advance a paid order through ACCEPTED, PROCESSING, READY_FOR_PICKUP, DISPATCHED, DELIVERED, or FULFILLED.",
+      parameters: {
+        type: Type.OBJECT,
+        properties: {
+          reference: { type: Type.STRING },
+          status: { type: Type.STRING },
+          note: { type: Type.STRING },
+          carrier: { type: Type.STRING },
+          trackingRef: { type: Type.STRING },
+        },
+        required: ["reference", "status"],
+      },
+    },
+    async execute(args, ctx) {
+      const allowed = ["ACCEPTED", "PROCESSING", "READY_FOR_PICKUP", "DISPATCHED", "DELIVERED", "FULFILLED"];
+      const status = String(args.status).toUpperCase();
+      if (!allowed.includes(status)) return { ok: false, error: "Unsupported order status." };
+      const result = await updateOrderStatus({ reference: args.reference, merchantId: ctx.merchantId, status: status as any, note: args.note, carrier: args.carrier, trackingRef: args.trackingRef });
+      if (!result.ok) return result;
       return { ok: true, reference: result.order.reference, status: result.order.status };
     },
   },
