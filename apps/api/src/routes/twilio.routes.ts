@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { env, features } from "../config/env.js";
+import { env, features, isProd } from "../config/env.js";
 import { logger } from "../config/logger.js";
 import { handleInbound } from "../services/inbound.service.js";
 import { sendWhatsAppReply } from "../integrations/whatsapp/whatsapp.client.js";
@@ -16,7 +16,7 @@ export const twilioRouter = Router();
  * "When a message comes in"): https://<tunnel>/api/webhooks/twilio
  */
 twilioRouter.post("/webhooks/twilio", (req, res) => {
-  if (env.TWILIO_VALIDATE_SIGNATURE) {
+  if (isProd || env.TWILIO_VALIDATE_SIGNATURE) {
     const fullUrl = `${env.PUBLIC_BASE_URL}${req.originalUrl}`;
     const ok = validateTwilioSignature(fullUrl, req.body ?? {}, req.header("x-twilio-signature"));
     if (!ok) {
