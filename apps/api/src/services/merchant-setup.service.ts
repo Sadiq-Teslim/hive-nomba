@@ -6,8 +6,13 @@ export async function handleMerchantSetup(rawPhone: string, text: string) {
   const merchant = await prisma.merchant.findFirst({
     where: { OR: [{ whatsappPhone: phone }, { accountPhone: phone }] },
   });
-  if (!merchant || merchant.setupState === "ACTIVE") return null;
-  if (merchant.whatsappConnectionStatus !== "CONNECTED") return null;
+  if (!merchant) return null;
+  if (merchant.whatsappConnectionStatus !== "CONNECTED") {
+    return {
+      text: `Welcome to Hive. To connect this WhatsApp number to ${merchant.businessName ?? "your business"}, send the activation code from your Hive dashboard.\n\nThe code starts with HIVE-. After your number is linked, I'll confirm your business details before you add products.`,
+    };
+  }
+  if (merchant.setupState === "ACTIVE") return null;
 
   const reply = text.trim();
   const yes = /^(yes|y|correct|confirm|ok|okay|sure)\b/i.test(reply);
