@@ -4,7 +4,7 @@ import type { Persona } from "./types";
 export const PERSONAS: Persona[] = [
   {
     id: "merchant-orthodox",
-    phone: "2348100000001",
+    phone: "2348123006496",
     chatName: "Hive",
     subtitle: "AI employee",
     avatarText: "H",
