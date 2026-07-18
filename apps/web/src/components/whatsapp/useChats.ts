@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ChatMessage, Persona } from "./types";
-import { PERSONAS, greetingFor } from "./personas";
+import { PERSONAS } from "./personas";
 import { API_ORIGIN } from "../../api";
 
 type Threads = Record<string, ChatMessage[]>;
 
-const STORAGE_KEY = "hive_wa_threads_v2";
+const STORAGE_KEY = "hive_wa_threads_v3";
 const uid = () => Math.random().toString(36).slice(2, 10);
 
 function loadThreads(): Threads {
@@ -15,12 +15,11 @@ function loadThreads(): Threads {
   } catch {
     /* ignore */
   }
-  // Seed each chat with the contact's greeting so it never starts empty.
-  const seeded: Threads = {};
+  const empty: Threads = {};
   for (const p of PERSONAS) {
-    seeded[p.phone] = [{ id: uid(), from: "hive", text: greetingFor(p), ts: Date.now() }];
+    empty[p.phone] = [];
   }
-  return seeded;
+  return empty;
 }
 
 export function useChats() {
@@ -116,7 +115,7 @@ export function useChats() {
   const resetThread = useCallback((persona: Persona) => {
     setThreads((t) => ({
       ...t,
-      [persona.phone]: [{ id: uid(), from: "hive", text: greetingFor(persona), ts: Date.now() }],
+      [persona.phone]: [],
     }));
   }, []);
 

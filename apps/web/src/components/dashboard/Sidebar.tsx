@@ -67,7 +67,7 @@ export function Sidebar({
           className="flex w-full items-center gap-3 rounded-xl bg-wa-accent/10 px-3 py-2.5 text-sm font-medium text-wa-accent transition-colors hover:bg-wa-accent/15"
         >
           <HugeiconsIcon icon={WhatsappIcon} size={18} strokeWidth={2} />
-          Hive WhatsApp Simulator
+          Hive WhatsApp
         </button>
         <button
           onClick={onBackToSite}

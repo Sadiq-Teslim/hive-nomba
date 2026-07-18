@@ -2,15 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ArrowLeft02Icon,
-  Video01Icon,
-  Call02Icon,
-  MoreVerticalIcon,
-  Search01Icon,
   SmileIcon,
   Attachment01Icon,
   Camera01Icon,
   SentIcon,
-  Mic01Icon,
   ArrowReloadHorizontalIcon,
 } from "@hugeicons/core-free-icons";
 import type { ChatMessage, Persona } from "./types";
@@ -70,22 +65,15 @@ export function ChatWindow({ persona, messages, typing, onSend, onBack, onReset 
             {typing ? <span className="text-wa-accent">typing…</span> : `${persona.subtitle} · online`}
           </div>
         </div>
-        <div className="flex items-center gap-4 text-wa-sub">
-          <HugeiconsIcon icon={Video01Icon} size={20} className="hidden sm:block" />
-          <HugeiconsIcon icon={Call02Icon} size={19} className="hidden sm:block" />
-          <HugeiconsIcon icon={Search01Icon} size={19} className="hidden sm:block" />
+        <div className="flex items-center text-wa-sub">
           <button onClick={onReset} title="Clear chat" className="hover:text-wa-text">
             <HugeiconsIcon icon={ArrowReloadHorizontalIcon} size={18} />
           </button>
-          <HugeiconsIcon icon={MoreVerticalIcon} size={20} />
         </div>
       </header>
 
       {/* Messages */}
       <div ref={scrollRef} className="wa-wallpaper flex-1 overflow-y-auto py-3">
-        <div className="mx-auto mb-3 w-fit rounded-md bg-[#182229] px-3 py-1 text-center text-[11px] text-wa-sub shadow">
-          🔒 Messages are simulated locally and sent to your Hive API.
-        </div>
         {messages.map((m) => (
           <MessageBubble key={m.id} msg={m} onQuickReply={(label) => onSend(label)} />
         ))}
@@ -146,10 +134,11 @@ export function ChatWindow({ persona, messages, typing, onSend, onBack, onReset 
         </div>
         <button
           onClick={submit}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-wa-accent text-wa-bg transition-transform active:scale-95"
-          aria-label={text.trim() ? "Send" : "Voice"}
+          disabled={!text.trim()}
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-wa-accent text-wa-bg transition-transform active:scale-95 disabled:cursor-not-allowed disabled:opacity-45"
+          aria-label="Send"
         >
-          <HugeiconsIcon icon={text.trim() ? SentIcon : Mic01Icon} size={21} />
+          <HugeiconsIcon icon={SentIcon} size={21} />
         </button>
       </div>
     </div>

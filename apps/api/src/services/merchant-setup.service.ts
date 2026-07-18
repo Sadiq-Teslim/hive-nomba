@@ -3,7 +3,9 @@ import { normalizePhone } from "../utils/ref.js";
 
 export async function handleMerchantSetup(rawPhone: string, text: string) {
   const phone = normalizePhone(rawPhone);
-  const merchant = await prisma.merchant.findUnique({ where: { whatsappPhone: phone } });
+  const merchant = await prisma.merchant.findFirst({
+    where: { OR: [{ whatsappPhone: phone }, { accountPhone: phone }] },
+  });
   if (!merchant || merchant.setupState === "ACTIVE") return null;
   if (merchant.whatsappConnectionStatus !== "CONNECTED") return null;
 

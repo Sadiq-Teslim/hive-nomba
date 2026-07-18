@@ -295,7 +295,9 @@ export async function tryActivateWhatsApp(rawPhone: string, text: string) {
     return { ok: false as const, text: "That activation code has expired. Please generate a new one from your Hive dashboard." };
   }
 
-  const existingPhoneOwner = await prisma.merchant.findUnique({ where: { whatsappPhone: phone } });
+  const existingPhoneOwner = await prisma.merchant.findFirst({
+    where: { OR: [{ whatsappPhone: phone }, { accountPhone: phone }] },
+  });
   if (existingPhoneOwner && existingPhoneOwner.id !== activation.merchantId) {
     await createRiskEvent({
       merchantId: activation.merchantId,

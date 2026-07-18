@@ -27,7 +27,9 @@ export interface RouteResult {
 export async function routeInbound(rawPhone: string): Promise<RouteResult> {
   const phone = normalizePhone(rawPhone);
 
-  const merchant = await prisma.merchant.findUnique({ where: { whatsappPhone: phone } });
+  const merchant = await prisma.merchant.findFirst({
+    where: { OR: [{ whatsappPhone: phone }, { accountPhone: phone }] },
+  });
   if (merchant) {
     return { party: "MERCHANT", mode: "merchant", ctx: { party: "MERCHANT", merchantId: merchant.id } };
   }

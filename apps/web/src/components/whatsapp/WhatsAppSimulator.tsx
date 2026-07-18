@@ -53,9 +53,9 @@ function EmptyState() {
       <div className="flex h-24 w-24 items-center justify-center rounded-full bg-wa-accent/10">
         <HugeiconsIcon icon={WhatsappIcon} size={48} className="text-wa-accent" />
       </div>
-      <h2 className="text-2xl font-light text-wa-text">Hive WhatsApp Simulator</h2>
+      <h2 className="text-2xl font-light text-wa-text">Hive</h2>
       <p className="max-w-sm text-sm text-wa-sub">
-        Open Orthodox Gadgets to run the seller demo through the same Hive conversation flow used on WhatsApp.
+        Open Hive to manage Orthodox Gadgets through the same conversation flow used on WhatsApp.
       </p>
     </div>
   );

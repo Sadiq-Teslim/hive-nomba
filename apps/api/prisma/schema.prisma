@@ -16,7 +16,7 @@ datasource db {
 model Merchant {
   id            String   @id @default(cuid())
   whatsappPhone String   @unique // E.164, e.g. 2348012345678
-  accountPhone  String?
+  accountPhone  String?  @unique
   email         String?  @unique
   passwordHash  String?
   businessName  String?

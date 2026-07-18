@@ -33,5 +33,6 @@ export function slugifyBusinessName(name: string): string {
 
 /** Normalize a phone number to a bare E.164-ish digit string (no +, no spaces). */
 export function normalizePhone(raw: string): string {
-  return raw.replace(/[^\d]/g, "");
+  const digits = raw.replace(/[^\d]/g, "");
+  return digits.length === 11 && digits.startsWith("0") ? `234${digits.slice(1)}` : digits;
 }
